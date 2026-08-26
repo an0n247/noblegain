@@ -1,12 +1,14 @@
-# Hello Friend
+# Noble Gain
 
-hi
+i want to vibe code a website
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://noblegain.lovable.app
+
 ## Build with Lovable
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8ef4962d-1726-43f6-b2f0-d4b400be5b46).
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6935d9db-d3e9-473c-9040-7c3d7835abcd).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.

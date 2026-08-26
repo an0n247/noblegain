@@ -1,0 +1,400 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  CheckCircle2,
+  XCircle,
+  Clock,
+  User,
+  ListTodo,
+  Loader2,
+  Inbox,
+  History,
+  ShieldCheck,
+  ChevronDown,
+} from "lucide-react";
+import { format } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+type FilterValue = "pending" | "verified" | "rejected" | "all";
+
+const FILTERS: { value: FilterValue; label: string; icon: typeof Clock }[] = [
+  { value: "pending", label: "Pending Approval", icon: Inbox },
+  { value: "verified", label: "Completed", icon: CheckCircle2 },
+  { value: "rejected", label: "Rejected", icon: XCircle },
+  { value: "all", label: "All History", icon: History },
+];
+
+export function TaskSubmissions() {
+  const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
+  const [filter, setFilter] = useState<FilterValue>("pending");
+  const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  const { data: counts } = useQuery({
+    queryKey: ["admin-submission-counts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("task_submissions")
+        .select("status");
+      if (error) throw error;
+      const tally: Record<FilterValue, number> = { pending: 0, verified: 0, rejected: 0, all: 0 };
+      data?.forEach((row) => {
+        const status = row.status as FilterValue;
+        if (status in tally) tally[status] += 1;
+      });
+      tally.all = tally.pending + tally.verified + tally.rejected;
+      return tally;
+    },
+  });
+
+  const { data: submissions, isLoading } = useQuery({
+    queryKey: ["admin-task-submissions", filter],
+    queryFn: async () => {
+      let query = supabase
+        .from("task_submissions")
+        .select(`
+          id,
+          status,
+          admin_note,
+          created_at,
+          verified_at,
+          tasks (id, title, points, category),
+          profiles (id, full_name, username)
+        `)
+        .order(filter === "pending" ? "created_at" : "verified_at", {
+          ascending: filter === "pending",
+          nullsFirst: false,
+        })
+        .limit(200);
+
+      if (filter !== "all") {
+        query = query.eq("status", filter);
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.error("Error fetching submissions:", error);
+        throw error;
+      }
+      return data as any[];
+    },
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-submissions-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "task_submissions" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
+          queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const verifyMutation = useMutation({
+    mutationFn: async ({ id, approve }: { id: string; approve: boolean }) => {
+      setProcessingId(id);
+      const note = adminNotes[id] || "";
+      const { data, error } = await (supabase.rpc as any)("verify_task_submission", {
+        _submission_id: id,
+        _approve: approve,
+        _admin_note: note,
+      });
+
+      if (error) throw error;
+      if (data && !data.success) throw new Error(data.message);
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
+      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
+      toast.success(data.message || "Task verification processed");
+      setAdminNotes((prev) => {
+        const next = { ...prev };
+        delete next[variables.id];
+        return next;
+      });
+      setProcessingId(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Error processing verification");
+      setProcessingId(null);
+    },
+  });
+
+  const emptyMessage = useMemo(() => {
+    switch (filter) {
+      case "pending":
+        return "No pending verifications at the moment.";
+      case "verified":
+        return "No completed tasks yet.";
+      case "rejected":
+        return "No rejected submissions yet.";
+      default:
+        return "No submissions recorded yet.";
+    }
+  }, [filter]);
+
+  const activeFilter = FILTERS.find((f) => f.value === filter) ?? FILTERS[0]!;
+
+  const statusBadge = (status: string) => {
+    if (status === "verified" || status === "approved") {
+      return (
+        <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-[9px] font-black uppercase px-1.5 h-5">
+          <CheckCircle2 className="h-3 w-3 mr-1" /> Completed
+        </Badge>
+      );
+    }
+    if (status === "rejected") {
+      return (
+        <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-[9px] font-black uppercase px-1.5 h-5">
+          <XCircle className="h-3 w-3 mr-1" /> Rejected
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[9px] font-black uppercase px-1.5 h-5">
+        <Clock className="h-3 w-3 mr-1" /> Pending
+      </Badge>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5 text-primary" />
+          Task Submissions
+        </h3>
+        <p className="text-sm text-muted-foreground font-medium">
+          Review tasks done by users — approve pending work and browse completed history.
+        </p>
+      </div>
+
+      {/* Status filter — mobile dropdown, desktop tabs */}
+      <div className="flex flex-col gap-4">
+        {isMobile ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between rounded-xl px-4 py-5 text-[11px] font-black uppercase tracking-widest border-border/40 bg-card/50 backdrop-blur-sm"
+              >
+                <span className="flex items-center gap-2">
+                  <activeFilter.icon className="h-4 w-4 text-primary" />
+                  {activeFilter.label}
+                  <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                    {counts?.[filter] ?? 0}
+                  </span>
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl">
+              {FILTERS.map((f) => (
+                <DropdownMenuItem
+                  key={f.value}
+                  onClick={() => setFilter(f.value)}
+                  className={cn(
+                    "flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-[11px] font-black uppercase tracking-widest cursor-pointer",
+                    filter === f.value && "bg-primary/10 text-primary"
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <f.icon className="h-4 w-4" />
+                    {f.label}
+                  </span>
+                  <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                    {counts?.[f.value] ?? 0}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {FILTERS.map((f) => {
+              const count = counts?.[f.value] ?? 0;
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => setFilter(f.value)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border",
+                    filter === f.value
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 border-transparent"
+                      : "bg-card/50 text-muted-foreground border-border/40 hover:bg-primary/5 hover:text-primary"
+                  )}
+                >
+                  <f.icon className="h-4 w-4" />
+                  {f.label}
+                  <span
+                    className={cn(
+                      "ml-1 rounded-md px-1.5 py-0.5 text-[9px]",
+                      filter === f.value ? "bg-primary-foreground/20" : "bg-primary/10 text-primary"
+                    )}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-border/50 bg-card overflow-hidden overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent border-border/50">
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">User</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">Task</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">Status</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">Submitted</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-right">
+                  {filter === "pending" ? "Actions" : "Details"}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {submissions?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground font-medium">
+                    {emptyMessage}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                submissions?.map((sub) => (
+                  <TableRow key={sub.id} className="border-border/40 hover:bg-accent/5 transition-colors">
+                    <TableCell className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-sm">{sub.profiles?.full_name || "Unknown User"}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase font-black">
+                            @{sub.profiles?.username || "unknown"}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <ListTodo className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <div className="font-bold text-sm">{sub.tasks?.title || "Deleted Task"}</div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {sub.tasks?.points != null && (
+                              <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary px-1 h-4">
+                                +{sub.tasks.points} PTS
+                              </Badge>
+                            )}
+                            {sub.tasks?.category && (
+                              <Badge variant="secondary" className="text-[9px] font-black px-1 h-4 uppercase">
+                                {sub.tasks.category}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-4 text-center">{statusBadge(sub.status)}</TableCell>
+                    <TableCell className="px-6 py-4 text-center">
+                      <div className="text-xs font-medium text-muted-foreground">
+                        {sub.created_at ? format(new Date(sub.created_at), "MMM d, HH:mm") : "—"}
+                      </div>
+                      {sub.verified_at && sub.status !== "pending" && (
+                        <div className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">
+                          Reviewed {format(new Date(sub.verified_at), "MMM d, HH:mm")}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 text-right">
+                      {sub.status === "pending" ? (
+                        <div className="flex flex-col gap-2 items-end">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/5 font-bold text-xs"
+                              onClick={() => verifyMutation.mutate({ id: sub.id, approve: false })}
+                              disabled={processingId === sub.id}
+                            >
+                              {processingId === sub.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              Reject
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-8 rounded-lg bg-green-600 hover:bg-green-700 text-white font-bold text-xs"
+                              onClick={() => verifyMutation.mutate({ id: sub.id, approve: true })}
+                              disabled={processingId === sub.id}
+                            >
+                              {processingId === sub.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                              ) : (
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                              )}
+                              Approve
+                            </Button>
+                          </div>
+                          <Input
+                            placeholder="Add rejection reason..."
+                            className="h-7 text-[10px] w-32 rounded-md"
+                            value={adminNotes[sub.id] || ""}
+                            onChange={(e) =>
+                              setAdminNotes((prev) => ({ ...prev, [sub.id]: e.target.value }))
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-xs font-medium text-muted-foreground max-w-[220px] ml-auto text-right">
+                          {sub.admin_note ? (
+                            <span className="italic">"{sub.admin_note}"</span>
+                          ) : (
+                            <span className="text-muted-foreground/60">No note</span>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
