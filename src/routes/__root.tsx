@@ -23,6 +23,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureBucketsExist } from "@/utils/storage-init";
 import { VideoAdInterstitial } from "@/components/VideoAdInterstitial";
+import { recordClientSession } from "@/lib/session-tracking.functions";
 
 
 
