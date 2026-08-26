@@ -861,7 +861,6 @@ export type Database = {
       }
     }
     Functions: {
-      _restore_exec: { Args: { sql: string }; Returns: undefined }
       admin_adjust_points: {
         Args: {
           _amount: number
@@ -937,6 +936,15 @@ export type Database = {
               unique_users: number
             }[]
           }
+      handle_admin_points_adjustment: {
+        Args: {
+          p_action_type: string
+          p_amount: number
+          p_reason: string
+          p_target_user_id: string
+        }
+        Returns: undefined
+      }
       has_completed_social_profile: {
         Args: { _user_id: string }
         Returns: boolean
