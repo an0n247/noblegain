@@ -17,6 +17,76 @@
   background: var(--muted-foreground);
 }
 
+/* RGB neon light that travels around the edge of a rounded container */
+@keyframes rgb-travel {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.rgb-neon-edge {
+  position: relative;
+  isolation: isolate;
+}
+
+.rgb-neon-edge::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from 0deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #8b00ff,
+    #ff0000
+  );
+  animation: rgb-travel 3s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.rgb-neon-edge::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #8b00ff,
+    #ff0000
+  );
+  animation: rgb-travel 3s linear infinite;
+  filter: blur(8px);
+  opacity: 0.45;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -2;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

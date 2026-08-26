@@ -38,7 +38,7 @@ export function LandingNav() {
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
       <div
         className={cn(
-          "mx-auto max-w-6xl rounded-2xl transition-all duration-300",
+          "mx-auto max-w-6xl rounded-2xl transition-all duration-300 rgb-neon-edge",
           scrolled
             ? "ink-header-shadow border border-hairline bg-ink/85 backdrop-blur-xl"
             : "border border-hairline/60 bg-ink/60 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)] backdrop-blur-md",
