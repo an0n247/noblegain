@@ -78,7 +78,7 @@ function MockWindow({
     <div
       className={cn(
         "mock-sheen overflow-hidden rounded-2xl border border-hairline bg-ink-2/90 shadow-[0_30px_60px_-40px_rgba(0,0,0,0.6)]",
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-2 border-b border-hairline px-4 py-3">
@@ -169,7 +169,7 @@ function DashboardMockup({ className = "" }: { className?: string }) {
                 <span
                   className={cn(
                     "shrink-0 text-xs font-bold",
-                    item.value.startsWith("-") ? "text-ink-muted" : "text-gold"
+                    item.value.startsWith("-") ? "text-ink-muted" : "text-gold",
                   )}
                 >
                   {item.value}
@@ -282,7 +282,9 @@ function RewardsMockup() {
             <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
               {item}
             </p>
-            <p className={cn("mt-1 text-xs font-black", idx === 0 ? "text-gold" : "text-ink-fg/50")}>
+            <p
+              className={cn("mt-1 text-xs font-black", idx === 0 ? "text-gold" : "text-ink-fg/50")}
+            >
               {idx === 0 ? "Now" : "—"}
             </p>
           </div>
@@ -329,9 +331,7 @@ function FadeIn({
 }
 
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">{children}</p>
-  );
+  return <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">{children}</p>;
 }
 
 function SectionWrapper({
@@ -364,7 +364,10 @@ function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] }}
+          transition={{
+            duration: 0.6,
+            ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number],
+          }}
           className="max-w-2xl"
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-hairline bg-ink-2/70 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
@@ -411,7 +414,11 @@ function HeroSection() {
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: 18 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] }}
+          transition={{
+            duration: 0.75,
+            delay: 0.12,
+            ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number],
+          }}
           className="relative w-full"
         >
           <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-gold/6 blur-2xl" />
@@ -453,8 +460,8 @@ function OpportunitiesSection() {
           Everything you need to earn, in one place.
         </h2>
         <p className="mt-5 text-[15px] leading-7 text-ink-muted sm:text-base">
-          Noble Gain brings opportunities, verification, progress and reward redemption into a single
-          account. You always know what an activity is worth and where it stands.
+          Noble Gain brings opportunities, verification, progress and reward redemption into a
+          single account. You always know what an activity is worth and where it stands.
         </p>
       </FadeIn>
 

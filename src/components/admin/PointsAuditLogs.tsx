@@ -1,25 +1,25 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  Coins, 
-  User, 
-  Activity, 
-  ChevronUp, 
-  ChevronDown, 
+import {
+  Loader2,
+  Coins,
+  User,
+  Activity,
+  ChevronUp,
+  ChevronDown,
   ArrowUpDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -38,15 +38,16 @@ export function PointsAuditLogs() {
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
-      let query = supabase
-        .from("points_audit_logs")
-        .select(`
+      let query = supabase.from("points_audit_logs").select(
+        `
           *,
           profiles:user_id (
             username,
             full_name
           )
-        `, { count: "exact" });
+        `,
+        { count: "exact" },
+      );
 
       // Handle sorting
       if (sortField === "username") {
@@ -59,10 +60,10 @@ export function PointsAuditLogs() {
       }
 
       const { data, error, count } = await query.range(from, to);
-      
+
       if (error) throw error;
       return { logs: data, totalCount: count || 0 };
-    }
+    },
   });
 
   const toggleSort = (field: string) => {
@@ -91,7 +92,7 @@ export function PointsAuditLogs() {
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["admin-points-audit-logs"] });
-        }
+        },
       )
       .subscribe();
 
@@ -100,82 +101,106 @@ export function PointsAuditLogs() {
     };
   }, [queryClient]);
 
-
-
-  if (isLoading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-
+  if (isLoading)
+    return (
+      <div className="flex justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
       <div>
         <h3 className="text-xl font-black uppercase tracking-tight">Points Audit Logs</h3>
-        <p className="text-sm text-muted-foreground font-medium">Detailed history of every point credit including welcome and referral rewards.</p>
+        <p className="text-sm text-muted-foreground font-medium">
+          Detailed history of every point credit including welcome and referral rewards.
+        </p>
       </div>
-      
+
       <div className="rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead 
+              <TableHead
                 className="font-black uppercase text-[10px] tracking-widest px-6 cursor-pointer hover:text-primary transition-colors"
                 onClick={() => toggleSort("username")}
               >
                 <div className="flex items-center gap-1">
                   User
                   {sortField === "username" ? (
-                    sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    sortDirection === "asc" ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )
                   ) : (
                     <ArrowUpDown className="h-2.5 w-2.5 opacity-50" />
                   )}
                 </div>
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="font-black uppercase text-[10px] tracking-widest px-6 cursor-pointer hover:text-primary transition-colors"
                 onClick={() => toggleSort("amount")}
               >
                 <div className="flex items-center gap-1">
                   Amount
                   {sortField === "amount" ? (
-                    sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    sortDirection === "asc" ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )
                   ) : (
                     <ArrowUpDown className="h-2.5 w-2.5 opacity-50" />
                   )}
                 </div>
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="font-black uppercase text-[10px] tracking-widest px-6 cursor-pointer hover:text-primary transition-colors"
                 onClick={() => toggleSort("reason")}
               >
                 <div className="flex items-center gap-1">
                   Reason
                   {sortField === "reason" ? (
-                    sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    sortDirection === "asc" ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )
                   ) : (
                     <ArrowUpDown className="h-2.5 w-2.5 opacity-50" />
                   )}
                 </div>
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="font-black uppercase text-[10px] tracking-widest px-6 cursor-pointer hover:text-primary transition-colors"
                 onClick={() => toggleSort("trigger_name")}
               >
                 <div className="flex items-center gap-1">
                   Source
                   {sortField === "trigger_name" ? (
-                    sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    sortDirection === "asc" ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )
                   ) : (
                     <ArrowUpDown className="h-2.5 w-2.5 opacity-50" />
                   )}
                 </div>
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="font-black uppercase text-[10px] tracking-widest px-6 text-right cursor-pointer hover:text-primary transition-colors"
                 onClick={() => toggleSort("created_at")}
               >
                 <div className="flex items-center justify-end gap-1">
                   Timestamp
                   {sortField === "created_at" ? (
-                    sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    sortDirection === "asc" ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )
                   ) : (
                     <ArrowUpDown className="h-2.5 w-2.5 opacity-50" />
                   )}
@@ -186,21 +211,31 @@ export function PointsAuditLogs() {
           <TableBody>
             {logs?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-muted-foreground font-medium">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-12 text-muted-foreground font-medium"
+                >
                   No point audit logs recorded yet.
                 </TableCell>
               </TableRow>
             ) : (
               logs?.map((log: any) => (
-                <TableRow key={log.id} className="border-border/40 hover:bg-accent/5 transition-colors group">
+                <TableRow
+                  key={log.id}
+                  className="border-border/40 hover:bg-accent/5 transition-colors group"
+                >
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <div className="bg-primary/5 p-1.5 rounded-lg group-hover:bg-primary/10 transition-colors">
                         <User className="h-3 w-3 text-primary" />
                       </div>
                       <div>
-                        <div className="font-bold text-sm tracking-tight">{log.profiles?.username || "Unknown"}</div>
-                        <div className="text-[10px] text-muted-foreground font-medium">{log.profiles?.full_name}</div>
+                        <div className="font-bold text-sm tracking-tight">
+                          {log.profiles?.username || "Unknown"}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground font-medium">
+                          {log.profiles?.full_name}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
@@ -213,14 +248,19 @@ export function PointsAuditLogs() {
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <Badge variant="outline" className="font-black uppercase text-[9px] tracking-wider px-2 py-0.5 border-primary/20 bg-primary/5 text-primary">
+                    <Badge
+                      variant="outline"
+                      className="font-black uppercase text-[9px] tracking-wider px-2 py-0.5 border-primary/20 bg-primary/5 text-primary"
+                    >
                       {log.reason}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-1.5">
                       <Activity className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-[10px] font-mono text-muted-foreground bg-muted/30 px-1.5 py-0.5 rounded uppercase">{log.trigger_name}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground bg-muted/30 px-1.5 py-0.5 rounded uppercase">
+                        {log.trigger_name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
@@ -241,15 +281,18 @@ export function PointsAuditLogs() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2 py-4">
           <div className="text-xs text-muted-foreground font-medium">
-            Showing <span className="font-bold text-foreground">{(page - 1) * pageSize + 1}</span> to{" "}
-            <span className="font-bold text-foreground">{Math.min(page * pageSize, totalCount)}</span> of{" "}
-            <span className="font-bold text-foreground">{totalCount}</span> logs
+            Showing <span className="font-bold text-foreground">{(page - 1) * pageSize + 1}</span>{" "}
+            to{" "}
+            <span className="font-bold text-foreground">
+              {Math.min(page * pageSize, totalCount)}
+            </span>{" "}
+            of <span className="font-bold text-foreground">{totalCount}</span> logs
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               className="h-8 px-2 min-w-[80px] font-black uppercase text-[10px] tracking-widest"
             >
@@ -268,7 +311,7 @@ export function PointsAuditLogs() {
                 } else {
                   pageNum = page - 2 + i;
                 }
-                
+
                 return (
                   <Button
                     key={pageNum}
@@ -277,7 +320,7 @@ export function PointsAuditLogs() {
                     onClick={() => setPage(pageNum)}
                     className={cn(
                       "h-8 w-8 p-0 font-bold text-[10px]",
-                      page === pageNum ? "bg-primary" : "hover:bg-primary/10 hover:text-primary"
+                      page === pageNum ? "bg-primary" : "hover:bg-primary/10 hover:text-primary",
                     )}
                   >
                     {pageNum}
@@ -288,7 +331,7 @@ export function PointsAuditLogs() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               className="h-8 px-2 min-w-[80px] font-black uppercase text-[10px] tracking-widest"
             >

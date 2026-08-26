@@ -45,7 +45,7 @@ export function useRealtimeBalance() {
           () => {
             queryClient.invalidateQueries({ queryKey: ["profile"] });
             queryClient.invalidateQueries({ queryKey: ["balanceTrend"] });
-          }
+          },
         )
         // 2. Points Transactions (Earned, Redeemed, Bonuses)
         .on(
@@ -66,7 +66,7 @@ export function useRealtimeBalance() {
                 });
               }
             }
-          }
+          },
         )
         // 3. Instant In-App Notifications (Task approvals, Rewards, Streaks)
         .on(
@@ -85,7 +85,7 @@ export function useRealtimeBalance() {
                 description: n.message,
               });
             }
-          }
+          },
         )
         // 4. Task Submissions & Verifications
         .on(
@@ -114,7 +114,7 @@ export function useRealtimeBalance() {
                 });
               }
             }
-          }
+          },
         )
         // 5. Streaks
         .on(
@@ -127,7 +127,7 @@ export function useRealtimeBalance() {
           },
           () => {
             queryClient.invalidateQueries({ queryKey: ["streak"] });
-          }
+          },
         )
         .subscribe();
     };

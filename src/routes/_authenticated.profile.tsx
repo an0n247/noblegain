@@ -1,27 +1,27 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Coins, 
-  Share2, 
-  Award, 
-  Shield, 
-  Settings as SettingsIcon, 
-  Camera, 
-  Loader2, 
-  Check, 
-  Lock, 
-  Gift, 
-  ArrowRight, 
-  Edit3, 
-  Eye, 
-  EyeOff, 
-  Globe, 
-  X, 
-  History as HistoryIcon, 
+import {
+  User,
+  Mail,
+  Calendar,
+  Coins,
+  Share2,
+  Award,
+  Shield,
+  Settings as SettingsIcon,
+  Camera,
+  Loader2,
+  Check,
+  Lock,
+  Gift,
+  ArrowRight,
+  Edit3,
+  Eye,
+  EyeOff,
+  Globe,
+  X,
+  History as HistoryIcon,
   LayoutDashboard,
   Crown,
   Sparkles,
@@ -31,9 +31,15 @@ import {
   KeyRound,
   ExternalLink,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,9 +56,16 @@ export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     title: "My Identity & Account Details | Noble Gain",
     meta: [
-      { name: "description", content: "View and manage your Noble Gain public identity, social handles, and personal reward milestones." },
+      {
+        name: "description",
+        content:
+          "View and manage your Noble Gain public identity, social handles, and personal reward milestones.",
+      },
       { property: "og:title", content: "My Profile | Noble Gain" },
-      { property: "og:description", content: "Check your earning stats, social connections, and profile details." },
+      {
+        property: "og:description",
+        content: "Check your earning stats, social connections, and profile details.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -63,19 +76,19 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] } 
-  }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] },
+  },
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { staggerChildren: 0.06 } 
-  }
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
 };
 
 function ProfilePage() {
@@ -103,7 +116,9 @@ function ProfilePage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       return data;
@@ -116,19 +131,19 @@ function ProfilePage() {
     if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
     if (profile?.twitter_handle) {
       setTwitter(profile.twitter_handle);
-      setVerifiedHandles(prev => ({ ...prev, twitter: true }));
+      setVerifiedHandles((prev) => ({ ...prev, twitter: true }));
     }
     if (profile?.facebook_handle) {
       setFacebook(profile.facebook_handle);
-      setVerifiedHandles(prev => ({ ...prev, facebook: true }));
+      setVerifiedHandles((prev) => ({ ...prev, facebook: true }));
     }
     if (profile?.telegram_handle) {
       setTelegram(profile.telegram_handle);
-      setVerifiedHandles(prev => ({ ...prev, telegram: true }));
+      setVerifiedHandles((prev) => ({ ...prev, telegram: true }));
     }
     if (profile?.instagram_handle) {
       setInstagram(profile.instagram_handle);
-      setVerifiedHandles(prev => ({ ...prev, instagram: true }));
+      setVerifiedHandles((prev) => ({ ...prev, instagram: true }));
     }
     if (profile?.phone_number) {
       const parts = profile.phone_number.split(" ");
@@ -149,38 +164,38 @@ function ProfilePage() {
 
   const handleManualVerify = async (type: string, handle: string) => {
     if (!handle || getValidationError(handle, type)) return;
-    
-    setVerifyingHandles(prev => ({ ...prev, [type]: true }));
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    setVerifyingHandles(prev => ({ ...prev, [type]: false }));
-    setVerifiedHandles(prev => ({ ...prev, [type]: true }));
+
+    setVerifyingHandles((prev) => ({ ...prev, [type]: true }));
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    setVerifyingHandles((prev) => ({ ...prev, [type]: false }));
+    setVerifiedHandles((prev) => ({ ...prev, [type]: true }));
     toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} handle verified!`);
   };
 
   const cleanHandle = (handle: string, type: string) => {
     if (!handle) return "";
     let clean = handle.trim();
-    
+
     const bases = {
       twitter: ["twitter.com/", "x.com/"],
       telegram: ["t.me/", "telegram.me/"],
       facebook: ["facebook.com/", "fb.com/"],
-      instagram: ["instagram.com/"]
+      instagram: ["instagram.com/"],
     };
 
     const platformBases = bases[type as keyof typeof bases];
     if (platformBases) {
       for (const base of platformBases) {
         if (clean.toLowerCase().includes(base)) {
-          const parts = clean.split(new RegExp(base, 'i'));
+          const parts = clean.split(new RegExp(base, "i"));
           if (parts.length > 1) {
             const handlePart = parts[1];
             if (handlePart) {
-              const segments = handlePart.split('/');
+              const segments = handlePart.split("/");
               const firstSegment = segments[0];
               if (firstSegment) {
-                const querySegments = firstSegment.split('?');
+                const querySegments = firstSegment.split("?");
                 const finalHandle = querySegments[0];
                 if (finalHandle) {
                   clean = finalHandle;
@@ -193,31 +208,31 @@ function ProfilePage() {
       }
     }
 
-    if (clean.startsWith('@')) clean = clean.slice(1);
-    clean = clean.replace(/^\/+|\/+$/g, '');
-    
+    if (clean.startsWith("@")) clean = clean.slice(1);
+    clean = clean.replace(/^\/+|\/+$/g, "");
+
     return clean;
   };
 
   const getValidationError = (handle: string, type: string) => {
     if (!handle) return null;
     const clean = cleanHandle(handle, type);
-    
-    if (type === 'twitter') {
+
+    if (type === "twitter") {
       if (clean.length < 4) return "Too short (min 4)";
       if (clean.length > 15) return "Too long (max 15)";
       if (!/^[a-zA-Z0-9_]+$/.test(clean)) return "Invalid characters";
     }
-    if (type === 'telegram') {
+    if (type === "telegram") {
       if (clean.length < 5) return "Too short (min 5)";
       if (clean.length > 32) return "Too long (max 32)";
       if (!/^[a-zA-Z0-9_]+$/.test(clean)) return "Invalid characters";
     }
-    if (type === 'facebook') {
+    if (type === "facebook") {
       if (clean.length < 5) return "Too short (min 5)";
       if (!/^[a-zA-Z0-9.]+$/.test(clean)) return "Invalid characters";
     }
-    if (type === 'instagram') {
+    if (type === "instagram") {
       if (clean.length > 30) return "Too long (max 30)";
       if (!/^[a-zA-Z0-9._]+$/.test(clean)) return "Invalid characters";
     }
@@ -230,14 +245,16 @@ function ProfilePage() {
 
   const updateProfile = useMutation({
     mutationFn: async (updates: any) => {
-      if (updates.twitter_handle && !validateHandle(updates.twitter_handle, 'twitter')) {
+      if (updates.twitter_handle && !validateHandle(updates.twitter_handle, "twitter")) {
         throw new Error("Invalid Twitter handle format");
       }
-      if (updates.telegram_handle && !validateHandle(updates.telegram_handle, 'telegram')) {
+      if (updates.telegram_handle && !validateHandle(updates.telegram_handle, "telegram")) {
         throw new Error("Invalid Telegram handle format");
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
       const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
       if (error) throw error;
@@ -254,7 +271,7 @@ function ProfilePage() {
   const handleAvatarSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
+
     if (file.size > 10 * 1024 * 1024) {
       toast.error("Image file size must be under 10MB");
       return;
@@ -273,9 +290,11 @@ function ProfilePage() {
     try {
       setIsCropOpen(false);
       setIsUploading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      
+
       const filePath = `${user.id}/${Date.now()}.jpg`;
       const url = await uploadImageWithFallback({
         bucket: "avatars",
@@ -331,9 +350,14 @@ function ProfilePage() {
   const { data: referralCount } = useQuery({
     queryKey: ["referralCount"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return 0;
-      const { count } = await supabase.from("profiles").select("*", { count: "exact", head: true }).eq("referred_by", user.id);
+      const { count } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("referred_by", user.id);
       return count || 0;
     },
   });
@@ -341,15 +365,17 @@ function ProfilePage() {
   const { data: authInfo } = useQuery({
     queryKey: ["authInfo"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return { isAdmin: false, isModerator: false, isTasker: false };
-      
+
       const [{ data: isAdmin }, { data: isModerator }, { data: isTasker }] = await Promise.all([
-        supabase.rpc("has_role", { _user_id: user.id, _role: 'admin' }),
-        supabase.rpc("has_role", { _user_id: user.id, _role: 'moderator' }),
-        supabase.rpc("has_role", { _user_id: user.id, _role: 'tasker' })
+        supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "moderator" }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "tasker" }),
       ]);
-      
+
       return { isAdmin, isModerator, isTasker };
     },
   });
@@ -375,7 +401,7 @@ function ProfilePage() {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
@@ -385,17 +411,20 @@ function ProfilePage() {
       <div className="pointer-events-none fixed inset-0 -z-10 ink-dots opacity-20 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
 
       {/* Hidden file input for avatar upload */}
-      <input 
-        id="avatar-upload" 
-        type="file" 
-        accept="image/png,image/jpeg,image/webp,image/jpg" 
-        className="hidden" 
-        onChange={handleAvatarSelect} 
-        disabled={isUploading} 
+      <input
+        id="avatar-upload"
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/jpg"
+        className="hidden"
+        onChange={handleAvatarSelect}
+        disabled={isUploading}
       />
 
       {/* Header Banner */}
-      <motion.header variants={fadeInUp} className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6">
+      <motion.header
+        variants={fadeInUp}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6"
+      >
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 border border-gold/25 text-[11px] font-bold text-gold tracking-widest uppercase">
             <User className="size-3.5" />
@@ -407,17 +436,18 @@ function ProfilePage() {
             My <span className="text-gold">Profile</span>
           </h1>
           <p className="text-sm font-medium text-ink-muted">
-            Manage your public identity, link verified social profiles, and track your account tier status.
+            Manage your public identity, link verified social profiles, and track your account tier
+            status.
           </p>
         </div>
 
-        <Button 
+        <Button
           variant={isEditing ? "outline" : "default"}
           className={cn(
             "rounded-xl font-bold h-11 px-5 text-xs transition-all shadow-md cursor-pointer",
-            isEditing 
-              ? "border-hairline bg-ink-2 hover:bg-ink-3 text-ink-fg" 
-              : "bg-gold text-ink hover:bg-gold-soft shadow-gold/10 font-black"
+            isEditing
+              ? "border-hairline bg-ink-2 hover:bg-ink-3 text-ink-fg"
+              : "bg-gold text-ink hover:bg-gold-soft shadow-gold/10 font-black",
           )}
           onClick={() => {
             if (isEditing) {
@@ -477,9 +507,9 @@ function ProfilePage() {
                 </Avatar>
 
                 {/* Camera upload overlay */}
-                <button 
+                <button
                   type="button"
-                  onClick={() => document.getElementById('avatar-upload')?.click()}
+                  onClick={() => document.getElementById("avatar-upload")?.click()}
                   className="absolute inset-0 bg-ink/75 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-gold cursor-pointer border-2 border-gold/40 shadow-lg"
                   title="Upload new profile picture"
                 >
@@ -488,29 +518,41 @@ function ProfilePage() {
                   ) : (
                     <>
                       <Camera className="size-5" />
-                      <span className="text-[9px] font-black uppercase tracking-wider mt-0.5">Change DP</span>
+                      <span className="text-[9px] font-black uppercase tracking-wider mt-0.5">
+                        Change DP
+                      </span>
                     </>
                   )}
                 </button>
               </div>
-              
+
               <div className="space-y-1 mb-6">
-                <h2 className="text-xl font-black text-ink-fg">{fullName || profile?.full_name || "Noble Member"}</h2>
+                <h2 className="text-xl font-black text-ink-fg">
+                  {fullName || profile?.full_name || "Noble Member"}
+                </h2>
                 <p className="text-xs font-bold text-ink-muted">
-                  @{username || profile?.username ? ((username || profile?.username || "").charAt(0).toUpperCase() + (username || profile?.username || "").slice(1)) : 'user'}
+                  @
+                  {username || profile?.username
+                    ? (username || profile?.username || "").charAt(0).toUpperCase() +
+                      (username || profile?.username || "").slice(1)
+                    : "user"}
                 </p>
               </div>
 
               {/* 2-Metric Balance Bar */}
               <div className="grid grid-cols-2 gap-3 py-4 border-y border-hairline mb-6">
                 <div className="space-y-0.5 text-center">
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Vault Balance</p>
+                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                    Vault Balance
+                  </p>
                   <p className="font-black font-mono text-base text-gold">
                     {pointsBalance.toLocaleString()} <span className="text-[10px]">PTS</span>
                   </p>
                 </div>
                 <div className="space-y-0.5 text-center border-l border-hairline">
-                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Referral Network</p>
+                  <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                    Referral Network
+                  </p>
                   <p className="font-black font-mono text-base text-ink-fg">
                     {referralCount} <span className="text-[10px] text-ink-muted">Invites</span>
                   </p>
@@ -524,13 +566,14 @@ function ProfilePage() {
                   <span className="text-gold font-mono">{pointsBalance % 1000} / 1000 PTS</span>
                 </div>
                 <div className="h-2 bg-ink-3 rounded-full overflow-hidden border border-hairline">
-                  <div 
-                    className="h-full bg-gradient-to-r from-gold to-emerald-400 rounded-full transition-all duration-500" 
+                  <div
+                    className="h-full bg-gradient-to-r from-gold to-emerald-400 rounded-full transition-all duration-500"
                     style={{ width: `${levelProgress}%` }}
                   />
                 </div>
                 <p className="text-[11px] text-ink-muted font-medium pt-1">
-                  Earn {1000 - (pointsBalance % 1000)} more PTS to level up to <strong>Tier {currentLevel + 1}</strong>!
+                  Earn {1000 - (pointsBalance % 1000)} more PTS to level up to{" "}
+                  <strong>Tier {currentLevel + 1}</strong>!
                 </p>
               </div>
             </div>
@@ -540,7 +583,7 @@ function ProfilePage() {
         {/* Right Column: Dynamic Form / Detail Hub */}
         <div className="md:col-span-7 space-y-6">
           {isEditing ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
@@ -549,56 +592,82 @@ function ProfilePage() {
               <div className="rounded-3xl border border-hairline bg-ink-2/70 p-6 sm:p-7 shadow-lg backdrop-blur-xl space-y-6">
                 <div>
                   <h3 className="text-lg font-black text-ink-fg">Edit Profile Information</h3>
-                  <p className="text-xs text-ink-muted font-medium">Update your public identity, avatar, and phone number</p>
+                  <p className="text-xs text-ink-muted font-medium">
+                    Update your public identity, avatar, and phone number
+                  </p>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="full-name" className="text-xs font-bold uppercase tracking-wider text-ink-muted">Full Name</Label>
-                    <Input 
-                      id="full-name" 
-                      value={fullName} 
-                      onChange={(e) => setFullName(e.target.value)} 
-                      className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium" 
+                    <Label
+                      htmlFor="full-name"
+                      className="text-xs font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Full Name
+                    </Label>
+                    <Input
+                      id="full-name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="username" className="text-xs font-bold uppercase tracking-wider text-ink-muted">Username</Label>
-                    <Input 
-                      id="username" 
-                      value={username} 
-                      onChange={(e) => setUsername(e.target.value)} 
-                      className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium" 
+                    <Label
+                      htmlFor="username"
+                      className="text-xs font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Username
+                    </Label>
+                    <Input
+                      id="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="avatar-url" className="text-xs font-bold uppercase tracking-wider text-ink-muted">Profile Picture (DP)</Label>
+                    <Label
+                      htmlFor="avatar-url"
+                      className="text-xs font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Profile Picture (DP)
+                    </Label>
                     <div className="flex gap-2">
-                      <Input 
-                        id="avatar-url" 
-                        value={avatarUrl} 
-                        onChange={(e) => setAvatarUrl(e.target.value)} 
-                        className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium flex-1 text-xs" 
-                        placeholder="https://example.com/photo.jpg or click camera to upload" 
+                      <Input
+                        id="avatar-url"
+                        value={avatarUrl}
+                        onChange={(e) => setAvatarUrl(e.target.value)}
+                        className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium flex-1 text-xs"
+                        placeholder="https://example.com/photo.jpg or click camera to upload"
                       />
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         className="rounded-xl h-11 border-hairline bg-ink hover:bg-ink-3 text-gold cursor-pointer px-4 gap-2 text-xs font-bold shrink-0"
-                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                        onClick={() => document.getElementById("avatar-upload")?.click()}
                         title="Upload file directly"
                         disabled={isUploading}
                       >
-                        {isUploading ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
+                        {isUploading ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Camera className="size-4" />
+                        )}
                         <span>Upload DP</span>
                       </Button>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="phone-number" className="text-xs font-bold uppercase tracking-wider text-ink-muted">Phone Number</Label>
+                    <Label
+                      htmlFor="phone-number"
+                      className="text-xs font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      Phone Number
+                    </Label>
                     <div className="flex gap-2">
                       <Select value={countryCode} onValueChange={setCountryCode}>
                         <SelectTrigger className="w-[110px] rounded-xl h-11 bg-ink border-hairline text-ink-fg font-bold">
@@ -614,12 +683,12 @@ function ProfilePage() {
                           <SelectItem value="+233">+233 (GH)</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Input 
-                        id="phone-number" 
-                        value={phoneBody} 
-                        onChange={(e) => setPhoneBody(e.target.value)} 
-                        className="flex-1 rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium font-mono" 
-                        placeholder="8123456789" 
+                      <Input
+                        id="phone-number"
+                        value={phoneBody}
+                        onChange={(e) => setPhoneBody(e.target.value)}
+                        className="flex-1 rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium font-mono"
+                        placeholder="8123456789"
                       />
                     </div>
                   </div>
@@ -640,41 +709,60 @@ function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Twitter / X */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="twitter" className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Twitter / X</Label>
+                      <Label
+                        htmlFor="twitter"
+                        className="text-[11px] font-bold uppercase tracking-wider text-ink-muted"
+                      >
+                        Twitter / X
+                      </Label>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center flex-1">
                           <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-hairline bg-ink-3 text-ink-muted text-xs h-11 font-mono">
                             x.com/
                           </span>
-                          <Input 
-                            id="twitter" 
-                            value={twitter} 
+                          <Input
+                            id="twitter"
+                            value={twitter}
                             onChange={(e) => {
-                              setTwitter(cleanHandle(e.target.value, 'twitter'));
-                              setVerifiedHandles(prev => ({ ...prev, twitter: false }));
-                            }} 
-                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg" 
-                            placeholder="username" 
+                              setTwitter(cleanHandle(e.target.value, "twitter"));
+                              setVerifiedHandles((prev) => ({ ...prev, twitter: false }));
+                            }}
+                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg"
+                            placeholder="username"
                           />
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className={cn(
                             "h-11 rounded-xl font-bold px-3 transition-all cursor-pointer",
-                            verifiedHandles['twitter'] ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25"
+                            verifiedHandles["twitter"]
+                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25",
                           )}
-                          disabled={!twitter || !!getValidationError(twitter, 'twitter') || verifyingHandles['twitter'] || verifiedHandles['twitter']}
-                          onClick={() => handleManualVerify('twitter', twitter)}
+                          disabled={
+                            !twitter ||
+                            !!getValidationError(twitter, "twitter") ||
+                            verifyingHandles["twitter"] ||
+                            verifiedHandles["twitter"]
+                          }
+                          onClick={() => handleManualVerify("twitter", twitter)}
                         >
-                          {verifyingHandles['twitter'] ? <Loader2 className="size-4 animate-spin" /> : 
-                           verifiedHandles['twitter'] ? <Check className="size-4" /> : "Verify"}
+                          {verifyingHandles["twitter"] ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : verifiedHandles["twitter"] ? (
+                            <Check className="size-4" />
+                          ) : (
+                            "Verify"
+                          )}
                         </Button>
                       </div>
                       {twitter && (
                         <p className="text-[10px] text-ink-muted">
-                          {getValidationError(twitter, 'twitter') ? (
-                            <span className="text-rose-400 font-bold">{getValidationError(twitter, 'twitter')}</span>
+                          {getValidationError(twitter, "twitter") ? (
+                            <span className="text-rose-400 font-bold">
+                              {getValidationError(twitter, "twitter")}
+                            </span>
                           ) : (
                             <span className="text-emerald-400">✓ Valid handle format</span>
                           )}
@@ -684,41 +772,60 @@ function ProfilePage() {
 
                     {/* Telegram */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="telegram" className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Telegram</Label>
+                      <Label
+                        htmlFor="telegram"
+                        className="text-[11px] font-bold uppercase tracking-wider text-ink-muted"
+                      >
+                        Telegram
+                      </Label>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center flex-1">
                           <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-hairline bg-ink-3 text-ink-muted text-xs h-11 font-mono">
                             t.me/
                           </span>
-                          <Input 
-                            id="telegram" 
-                            value={telegram} 
+                          <Input
+                            id="telegram"
+                            value={telegram}
                             onChange={(e) => {
-                              setTelegram(cleanHandle(e.target.value, 'telegram'));
-                              setVerifiedHandles(prev => ({ ...prev, telegram: false }));
-                            }} 
-                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg" 
-                            placeholder="username" 
+                              setTelegram(cleanHandle(e.target.value, "telegram"));
+                              setVerifiedHandles((prev) => ({ ...prev, telegram: false }));
+                            }}
+                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg"
+                            placeholder="username"
                           />
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className={cn(
                             "h-11 rounded-xl font-bold px-3 transition-all cursor-pointer",
-                            verifiedHandles['telegram'] ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25"
+                            verifiedHandles["telegram"]
+                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25",
                           )}
-                          disabled={!telegram || !!getValidationError(telegram, 'telegram') || verifyingHandles['telegram'] || verifiedHandles['telegram']}
-                          onClick={() => handleManualVerify('telegram', telegram)}
+                          disabled={
+                            !telegram ||
+                            !!getValidationError(telegram, "telegram") ||
+                            verifyingHandles["telegram"] ||
+                            verifiedHandles["telegram"]
+                          }
+                          onClick={() => handleManualVerify("telegram", telegram)}
                         >
-                          {verifyingHandles['telegram'] ? <Loader2 className="size-4 animate-spin" /> : 
-                           verifiedHandles['telegram'] ? <Check className="size-4" /> : "Verify"}
+                          {verifyingHandles["telegram"] ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : verifiedHandles["telegram"] ? (
+                            <Check className="size-4" />
+                          ) : (
+                            "Verify"
+                          )}
                         </Button>
                       </div>
                       {telegram && (
                         <p className="text-[10px] text-ink-muted">
-                          {getValidationError(telegram, 'telegram') ? (
-                            <span className="text-rose-400 font-bold">{getValidationError(telegram, 'telegram')}</span>
+                          {getValidationError(telegram, "telegram") ? (
+                            <span className="text-rose-400 font-bold">
+                              {getValidationError(telegram, "telegram")}
+                            </span>
                           ) : (
                             <span className="text-emerald-400">✓ Valid handle format</span>
                           )}
@@ -728,70 +835,104 @@ function ProfilePage() {
 
                     {/* Facebook */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="facebook" className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Facebook</Label>
+                      <Label
+                        htmlFor="facebook"
+                        className="text-[11px] font-bold uppercase tracking-wider text-ink-muted"
+                      >
+                        Facebook
+                      </Label>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center flex-1">
                           <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-hairline bg-ink-3 text-ink-muted text-xs h-11 font-mono">
                             fb.com/
                           </span>
-                          <Input 
-                            id="facebook" 
-                            value={facebook} 
+                          <Input
+                            id="facebook"
+                            value={facebook}
                             onChange={(e) => {
-                              setFacebook(cleanHandle(e.target.value, 'facebook'));
-                              setVerifiedHandles(prev => ({ ...prev, facebook: false }));
-                            }} 
-                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg" 
-                            placeholder="username" 
+                              setFacebook(cleanHandle(e.target.value, "facebook"));
+                              setVerifiedHandles((prev) => ({ ...prev, facebook: false }));
+                            }}
+                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg"
+                            placeholder="username"
                           />
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className={cn(
                             "h-11 rounded-xl font-bold px-3 transition-all cursor-pointer",
-                            verifiedHandles['facebook'] ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25"
+                            verifiedHandles["facebook"]
+                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25",
                           )}
-                          disabled={!facebook || !!getValidationError(facebook, 'facebook') || verifyingHandles['facebook'] || verifiedHandles['facebook']}
-                          onClick={() => handleManualVerify('facebook', facebook)}
+                          disabled={
+                            !facebook ||
+                            !!getValidationError(facebook, "facebook") ||
+                            verifyingHandles["facebook"] ||
+                            verifiedHandles["facebook"]
+                          }
+                          onClick={() => handleManualVerify("facebook", facebook)}
                         >
-                          {verifyingHandles['facebook'] ? <Loader2 className="size-4 animate-spin" /> : 
-                           verifiedHandles['facebook'] ? <Check className="size-4" /> : "Verify"}
+                          {verifyingHandles["facebook"] ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : verifiedHandles["facebook"] ? (
+                            <Check className="size-4" />
+                          ) : (
+                            "Verify"
+                          )}
                         </Button>
                       </div>
                     </div>
 
                     {/* Instagram */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="instagram" className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Instagram</Label>
+                      <Label
+                        htmlFor="instagram"
+                        className="text-[11px] font-bold uppercase tracking-wider text-ink-muted"
+                      >
+                        Instagram
+                      </Label>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center flex-1">
                           <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-hairline bg-ink-3 text-ink-muted text-xs h-11 font-mono">
                             ig.com/
                           </span>
-                          <Input 
-                            id="instagram" 
-                            value={instagram} 
+                          <Input
+                            id="instagram"
+                            value={instagram}
                             onChange={(e) => {
-                              setInstagram(cleanHandle(e.target.value, 'instagram'));
-                              setVerifiedHandles(prev => ({ ...prev, instagram: false }));
-                            }} 
-                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg" 
-                            placeholder="username" 
+                              setInstagram(cleanHandle(e.target.value, "instagram"));
+                              setVerifiedHandles((prev) => ({ ...prev, instagram: false }));
+                            }}
+                            className="rounded-l-none rounded-r-xl h-11 bg-ink border-hairline text-xs font-mono text-ink-fg"
+                            placeholder="username"
                           />
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className={cn(
                             "h-11 rounded-xl font-bold px-3 transition-all cursor-pointer",
-                            verifiedHandles['instagram'] ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25"
+                            verifiedHandles["instagram"]
+                              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              : "bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25",
                           )}
-                          disabled={!instagram || !!getValidationError(instagram, 'instagram') || verifyingHandles['instagram'] || verifiedHandles['instagram']}
-                          onClick={() => handleManualVerify('instagram', instagram)}
+                          disabled={
+                            !instagram ||
+                            !!getValidationError(instagram, "instagram") ||
+                            verifyingHandles["instagram"] ||
+                            verifiedHandles["instagram"]
+                          }
+                          onClick={() => handleManualVerify("instagram", instagram)}
                         >
-                          {verifyingHandles['instagram'] ? <Loader2 className="size-4 animate-spin" /> : 
-                           verifiedHandles['instagram'] ? <Check className="size-4" /> : "Verify"}
+                          {verifyingHandles["instagram"] ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : verifiedHandles["instagram"] ? (
+                            <Check className="size-4" />
+                          ) : (
+                            "Verify"
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -799,7 +940,7 @@ function ProfilePage() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <Button 
+                  <Button
                     variant="outline"
                     className="flex-1 rounded-xl font-bold h-11 border-hairline hover:bg-ink-3 text-xs cursor-pointer"
                     onClick={() => {
@@ -810,19 +951,19 @@ function ProfilePage() {
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    className="flex-[2] rounded-xl font-bold h-11 text-xs bg-gold text-ink hover:bg-gold-soft cursor-pointer shadow-md shadow-gold/10 font-black" 
+                  <Button
+                    className="flex-[2] rounded-xl font-bold h-11 text-xs bg-gold text-ink hover:bg-gold-soft cursor-pointer shadow-md shadow-gold/10 font-black"
                     onClick={() => {
                       const combinedPhone = `${countryCode} ${phoneBody}`.trim();
-                      updateProfile.mutate({ 
-                        full_name: fullName, 
+                      updateProfile.mutate({
+                        full_name: fullName,
                         username: username,
                         avatar_url: avatarUrl,
                         phone_number: combinedPhone,
                         twitter_handle: twitter,
                         facebook_handle: facebook,
                         telegram_handle: telegram,
-                        instagram_handle: instagram
+                        instagram_handle: instagram,
                       });
                     }}
                     disabled={updateProfile.isPending}
@@ -849,29 +990,38 @@ function ProfilePage() {
 
                 <form onSubmit={handlePasswordChange} className="space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="new-password" className="text-xs font-bold uppercase tracking-wider text-ink-muted">New Password</Label>
+                    <Label
+                      htmlFor="new-password"
+                      className="text-xs font-bold uppercase tracking-wider text-ink-muted"
+                    >
+                      New Password
+                    </Label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-3.5 size-4 text-ink-muted" />
-                      <Input 
-                        id="new-password" 
-                        type={showNewPassword ? "text" : "password"} 
-                        value={newPassword} 
-                        onChange={(e) => setNewPassword(e.target.value)} 
-                        className="pl-10 pr-10 rounded-xl h-11 bg-ink border-hairline text-ink-fg" 
-                        placeholder="Minimum 6 characters" 
+                      <Input
+                        id="new-password"
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="pl-10 pr-10 rounded-xl h-11 bg-ink border-hairline text-ink-fg"
+                        placeholder="Minimum 6 characters"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
                         className="absolute right-3.5 top-3.5 text-ink-muted hover:text-ink-fg transition-colors cursor-pointer"
                       >
-                        {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        {showNewPassword ? (
+                          <EyeOff className="size-4" />
+                        ) : (
+                          <Eye className="size-4" />
+                        )}
                       </button>
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full rounded-xl font-bold h-11 text-xs bg-gold text-ink hover:bg-gold-soft cursor-pointer shadow-md shadow-gold/10" 
+                  <Button
+                    type="submit"
+                    className="w-full rounded-xl font-bold h-11 text-xs bg-gold text-ink hover:bg-gold-soft cursor-pointer shadow-md shadow-gold/10"
                     disabled={isChangingPassword || !newPassword}
                   >
                     {isChangingPassword ? (
@@ -886,7 +1036,7 @@ function ProfilePage() {
               </div>
             </motion.div>
           ) : (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
@@ -896,8 +1046,12 @@ function ProfilePage() {
                 <div className="rounded-3xl border border-gold/30 bg-gradient-to-br from-[#002d26] via-[#003830] to-[#011e19] p-6 text-white shadow-xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-gold">Internal Access</span>
-                      <h3 className="text-lg font-black text-white">Platform Administration Portals</h3>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gold">
+                        Internal Access
+                      </span>
+                      <h3 className="text-lg font-black text-white">
+                        Platform Administration Portals
+                      </h3>
                     </div>
                     <div className="size-10 rounded-2xl bg-gold/15 text-gold flex items-center justify-center border border-gold/30">
                       <Shield className="size-5" />
@@ -906,8 +1060,8 @@ function ProfilePage() {
 
                   <div className="grid grid-cols-1 gap-2.5 pt-1">
                     {isAdmin && (
-                      <Link 
-                        to="/admin" 
+                      <Link
+                        to="/admin"
                         className="flex items-center justify-between p-3.5 bg-black/40 rounded-2xl border border-white/15 hover:border-gold/50 transition-all group cursor-pointer"
                       >
                         <div className="flex items-center gap-3">
@@ -915,17 +1069,21 @@ function ProfilePage() {
                             <LayoutDashboard className="size-4" />
                           </div>
                           <div>
-                            <span className="text-xs font-bold text-white block">Admin Master Console</span>
-                            <span className="text-[10px] text-white/60">Manage tasks, rewards, and user submissions</span>
+                            <span className="text-xs font-bold text-white block">
+                              Admin Master Console
+                            </span>
+                            <span className="text-[10px] text-white/60">
+                              Manage tasks, rewards, and user submissions
+                            </span>
                           </div>
                         </div>
                         <ArrowRight className="size-4 text-gold group-hover:translate-x-1 transition-transform" />
                       </Link>
                     )}
-                    
+
                     {isModerator && (
-                      <Link 
-                        to="/moderator" 
+                      <Link
+                        to="/moderator"
                         className="flex items-center justify-between p-3.5 bg-black/40 rounded-2xl border border-white/15 hover:border-gold/50 transition-all group cursor-pointer"
                       >
                         <div className="flex items-center gap-3">
@@ -933,17 +1091,21 @@ function ProfilePage() {
                             <Shield className="size-4" />
                           </div>
                           <div>
-                            <span className="text-xs font-bold text-white block">Moderator Tools</span>
-                            <span className="text-[10px] text-white/60">Review and verify task submissions</span>
+                            <span className="text-xs font-bold text-white block">
+                              Moderator Tools
+                            </span>
+                            <span className="text-[10px] text-white/60">
+                              Review and verify task submissions
+                            </span>
                           </div>
                         </div>
                         <ArrowRight className="size-4 text-gold group-hover:translate-x-1 transition-transform" />
                       </Link>
                     )}
-                    
+
                     {isTasker && (
-                      <Link 
-                        to="/tasker" 
+                      <Link
+                        to="/tasker"
                         className="flex items-center justify-between p-3.5 bg-black/40 rounded-2xl border border-white/15 hover:border-gold/50 transition-all group cursor-pointer"
                       >
                         <div className="flex items-center gap-3">
@@ -951,8 +1113,12 @@ function ProfilePage() {
                             <Shield className="size-4" />
                           </div>
                           <div>
-                            <span className="text-xs font-bold text-white block">Tasker Workspace</span>
-                            <span className="text-[10px] text-white/60">Create and curate partner opportunities</span>
+                            <span className="text-xs font-bold text-white block">
+                              Tasker Workspace
+                            </span>
+                            <span className="text-[10px] text-white/60">
+                              Create and curate partner opportunities
+                            </span>
                           </div>
                         </div>
                         <ArrowRight className="size-4 text-gold group-hover:translate-x-1 transition-transform" />
@@ -964,8 +1130,8 @@ function ProfilePage() {
 
               {/* Quick Action Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Link 
-                  to="/redeem" 
+                <Link
+                  to="/redeem"
                   className="rounded-3xl p-5 bg-ink-2/70 border border-hairline hover:border-gold/30 transition-all duration-300 shadow-md group flex items-center justify-between backdrop-blur-xl"
                 >
                   <div className="flex items-center gap-3.5">
@@ -974,14 +1140,16 @@ function ProfilePage() {
                     </div>
                     <div>
                       <p className="text-xs font-black text-ink-fg">Redeem Rewards</p>
-                      <p className="text-[11px] font-medium text-ink-muted">Browse gift card catalog</p>
+                      <p className="text-[11px] font-medium text-ink-muted">
+                        Browse gift card catalog
+                      </p>
                     </div>
                   </div>
                   <ArrowRight className="size-4 text-gold group-hover:translate-x-1 transition-transform" />
                 </Link>
 
-                <Link 
-                  to="/transactions" 
+                <Link
+                  to="/transactions"
                   className="rounded-3xl p-5 bg-ink-2/70 border border-hairline hover:border-gold/30 transition-all duration-300 shadow-md group flex items-center justify-between backdrop-blur-xl"
                 >
                   <div className="flex items-center gap-3.5">
@@ -990,7 +1158,9 @@ function ProfilePage() {
                     </div>
                     <div>
                       <p className="text-xs font-black text-ink-fg">Transaction Ledger</p>
-                      <p className="text-[11px] font-medium text-ink-muted">View past claims & credits</p>
+                      <p className="text-[11px] font-medium text-ink-muted">
+                        View past claims & credits
+                      </p>
                     </div>
                   </div>
                   <ArrowRight className="size-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
@@ -1001,7 +1171,9 @@ function ProfilePage() {
               <div className="rounded-3xl border border-hairline bg-ink-2/70 p-6 shadow-lg backdrop-blur-xl space-y-4">
                 <div className="flex items-center justify-between border-b border-hairline pb-4">
                   <h3 className="text-base font-black text-ink-fg">Verified Channels & Details</h3>
-                  <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Public Profile</span>
+                  <span className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                    Public Profile
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -1010,8 +1182,12 @@ function ProfilePage() {
                       <Mail className="size-4" />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Email</p>
-                      <p className="text-xs font-bold text-ink-fg truncate">{profile?.email || 'N/A'}</p>
+                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                        Email
+                      </p>
+                      <p className="text-xs font-bold text-ink-fg truncate">
+                        {profile?.email || "N/A"}
+                      </p>
                     </div>
                   </div>
 
@@ -1020,8 +1196,12 @@ function ProfilePage() {
                       <Phone className="size-4" />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Phone</p>
-                      <p className="text-xs font-bold text-ink-fg truncate font-mono">{profile?.phone_number || 'Not added'}</p>
+                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                        Phone
+                      </p>
+                      <p className="text-xs font-bold text-ink-fg truncate font-mono">
+                        {profile?.phone_number || "Not added"}
+                      </p>
                     </div>
                   </div>
 
@@ -1030,9 +1210,11 @@ function ProfilePage() {
                       <Share2 className="size-4" />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Twitter / X</p>
+                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                        Twitter / X
+                      </p>
                       <p className="text-xs font-bold text-ink-fg truncate font-mono">
-                        {profile?.twitter_handle ? `@${profile.twitter_handle}` : 'Not linked'}
+                        {profile?.twitter_handle ? `@${profile.twitter_handle}` : "Not linked"}
                       </p>
                     </div>
                   </div>
@@ -1042,9 +1224,11 @@ function ProfilePage() {
                       <Globe className="size-4" />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Telegram</p>
+                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                        Telegram
+                      </p>
                       <p className="text-xs font-bold text-ink-fg truncate font-mono">
-                        {profile?.telegram_handle ? `@${profile.telegram_handle}` : 'Not linked'}
+                        {profile?.telegram_handle ? `@${profile.telegram_handle}` : "Not linked"}
                       </p>
                     </div>
                   </div>
@@ -1054,9 +1238,17 @@ function ProfilePage() {
                       <Calendar className="size-4" />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">Member Since</p>
+                      <p className="text-[10px] font-bold text-ink-muted uppercase tracking-wider">
+                        Member Since
+                      </p>
                       <p className="text-xs font-bold text-ink-fg">
-                        {profile?.created_at ? new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                        {profile?.created_at
+                          ? new Date(profile.created_at).toLocaleDateString(undefined, {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "N/A"}
                       </p>
                     </div>
                   </div>

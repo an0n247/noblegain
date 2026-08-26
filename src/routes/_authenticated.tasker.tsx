@@ -6,7 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/tasker")({
   loader: async ({ location }) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       throw redirect({
@@ -14,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/tasker")({
         search: { redirect: location.pathname },
       });
     }
-    
+
     return { userId: user.id };
   },
   component: TaskerRouteComponent,
@@ -27,12 +29,12 @@ function TaskerRouteComponent() {
     queryKey: ["tasker-role-check", userId],
     queryFn: async () => {
       const [{ data: isAdmin }, { data: isModerator }, { data: isTasker }] = await Promise.all([
-        supabase.rpc("has_role", { _user_id: userId, _role: 'admin' as any }),
-        supabase.rpc("has_role", { _user_id: userId, _role: 'moderator' as any }),
-        supabase.rpc("has_role", { _user_id: userId, _role: 'tasker' as any })
+        supabase.rpc("has_role", { _user_id: userId, _role: "admin" as any }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "moderator" as any }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "tasker" as any }),
       ]);
       return { isAdmin, isModerator, isTasker };
-    }
+    },
   });
 
   if (isLoading) {
@@ -57,8 +59,12 @@ function TaskerRouteComponent() {
     <div className="min-h-screen bg-accent/5 pb-12">
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">Tasker Panel</h1>
-          <p className="text-muted-foreground font-medium">Manage platform tasks and submissions.</p>
+          <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">
+            Tasker Panel
+          </h1>
+          <p className="text-muted-foreground font-medium">
+            Manage platform tasks and submissions.
+          </p>
         </div>
         <AdminPanel />
       </div>

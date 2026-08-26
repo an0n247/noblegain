@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/api/public/og')({
+export const Route = createFileRoute("/api/public/og")({
   server: {
     handlers: {
       GET: async ({ request }) => {
@@ -9,10 +9,18 @@ export const Route = createFileRoute('/api/public/og')({
           value
             .slice(0, maxLength)
             .replace(/[<>&"']/g, (c) =>
-              c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '&' ? '&amp;' : c === '"' ? '&quot;' : '&apos;'
+              c === "<"
+                ? "&lt;"
+                : c === ">"
+                  ? "&gt;"
+                  : c === "&"
+                    ? "&amp;"
+                    : c === '"'
+                      ? "&quot;"
+                      : "&apos;",
             );
-        const title = escapeXml(searchParams.get('title') || 'Noble Gain', 60);
-        const description = escapeXml(searchParams.get('description') || 'Reward Your Time', 120);
+        const title = escapeXml(searchParams.get("title") || "Noble Gain", 60);
+        const description = escapeXml(searchParams.get("description") || "Reward Your Time", 120);
 
         // We'll generate a high-quality SVG that serves as a dynamic OpenGraph image.
         // This is safe for Workers as it doesn't use native binaries.
@@ -57,8 +65,8 @@ export const Route = createFileRoute('/api/public/og')({
 
         return new Response(svg, {
           headers: {
-            'Content-Type': 'image/svg+xml',
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            "Content-Type": "image/svg+xml",
+            "Cache-Control": "public, max-age=31536000, immutable",
           },
         });
       },

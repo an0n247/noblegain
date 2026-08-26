@@ -7,9 +7,15 @@ export function DashboardStats() {
   const { data: streak } = useQuery({
     queryKey: ["streak"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
-      const { data } = await supabase.from("user_streaks").select("*").eq("user_id", user.id).single();
+      const { data } = await supabase
+        .from("user_streaks")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
       return data;
     },
   });
@@ -17,9 +23,14 @@ export function DashboardStats() {
   const { data: referralCount } = useQuery({
     queryKey: ["referralCount"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return 0;
-      const { count } = await supabase.from("profiles").select("*", { count: 'exact', head: true }).eq("referred_by", user.id);
+      const { count } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("referred_by", user.id);
       return count || 0;
     },
   });

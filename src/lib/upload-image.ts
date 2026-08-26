@@ -7,7 +7,7 @@ export async function blobToCompressedDataUrl(
   blobOrFile: Blob | File,
   maxWidth = 400,
   maxHeight = 400,
-  quality = 0.85
+  quality = 0.85,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -83,9 +83,14 @@ export async function uploadImageWithFallback({
         return data.publicUrl;
       }
     }
-    console.warn(`Supabase Storage upload to bucket "${bucket}" failed (${uploadError?.message}), seamlessly using optimized image data.`);
+    console.warn(
+      `Supabase Storage upload to bucket "${bucket}" failed (${uploadError?.message}), seamlessly using optimized image data.`,
+    );
   } catch (err: any) {
-    console.warn(`Supabase Storage exception on bucket "${bucket}", seamlessly using optimized image data:`, err?.message);
+    console.warn(
+      `Supabase Storage exception on bucket "${bucket}", seamlessly using optimized image data:`,
+      err?.message,
+    );
   }
 
   // Fallback to compressed base64 data URL

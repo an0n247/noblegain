@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -41,12 +41,15 @@ const VastAdModal: React.FC<VastAdModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      // Prevent closing while ad is playing unless it's an error
-      if (!open && !isAdPlaying || error) {
-        onClose();
-      }
-    }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        // Prevent closing while ad is playing unless it's an error
+        if ((!open && !isAdPlaying) || error) {
+          onClose();
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden bg-black border-none rounded-2xl">
         <DialogHeader className="p-6 bg-card text-card-foreground border-b border-border/50">
           <DialogTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-2">
@@ -62,7 +65,7 @@ const VastAdModal: React.FC<VastAdModalProps> = ({
             <div className="text-center p-8 space-y-4">
               <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
               <p className="text-white font-bold">{error}</p>
-              <button 
+              <button
                 onClick={onClose}
                 className="bg-primary text-primary-foreground px-6 py-2 rounded-xl font-bold"
               >
@@ -70,14 +73,14 @@ const VastAdModal: React.FC<VastAdModalProps> = ({
               </button>
             </div>
           ) : (
-            <VastPlayer 
+            <VastPlayer
               vastTagUrl={vastTagUrl}
               onAdComplete={handleAdComplete}
               onAdError={handleAdError}
               onAdStarted={() => setIsAdPlaying(true)}
             />
           )}
-          
+
           {!isAdPlaying && !error && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10">
               <div className="text-center text-white space-y-2">

@@ -1,19 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  History, 
-  Coins, 
-  Loader2, 
-  Gift, 
-  TrendingUp, 
-  ArrowRight, 
-  Clock, 
-  ArrowUpRight, 
+import {
+  History,
+  Coins,
+  Loader2,
+  Gift,
+  TrendingUp,
+  ArrowRight,
+  Clock,
+  ArrowUpRight,
   ArrowDownRight,
   Filter,
   Sparkles,
-  Wallet
+  Wallet,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,9 +32,15 @@ export const Route = createFileRoute("/_authenticated/transactions")({
   head: () => ({
     title: "Transaction History & Ledger | Noble Gain",
     meta: [
-      { name: "description", content: "Complete cryptographic audit trail of all points earned and spent on Noble Gain." },
+      {
+        name: "description",
+        content: "Complete cryptographic audit trail of all points earned and spent on Noble Gain.",
+      },
       { property: "og:title", content: "Transaction Ledger | Noble Gain" },
-      { property: "og:description", content: "Detailed view of your point earnings and reward redemptions." }
+      {
+        property: "og:description",
+        content: "Detailed view of your point earnings and reward redemptions.",
+      },
     ],
   }),
   component: TransactionsPage,
@@ -42,19 +48,19 @@ export const Route = createFileRoute("/_authenticated/transactions")({
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] } 
-  }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] },
+  },
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { staggerChildren: 0.06 } 
-  }
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
 };
 
 function TransactionsPage() {
@@ -66,7 +72,9 @@ function TransactionsPage() {
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       return data;
@@ -76,7 +84,9 @@ function TransactionsPage() {
   const { data: transactions, isLoading: isTransactionsLoading } = useQuery({
     queryKey: ["transactions"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return [];
       const { data } = await supabase
         .from("points_transactions")
@@ -100,7 +110,7 @@ function TransactionsPage() {
             .select("*")
             .eq("id", transactionId)
             .single();
-          
+
           if (data && !error) {
             setSelectedTx(data);
             setIsModalOpen(true);
@@ -117,18 +127,26 @@ function TransactionsPage() {
   };
 
   // Filter calculations
-  const filteredList = transactions?.filter((tx: any) => {
-    if (filterType === "credits") return tx.amount > 0 && tx.status !== "pending";
-    if (filterType === "debits") return tx.amount < 0 && tx.status !== "pending";
-    if (filterType === "pending") return tx.status === "pending";
-    return true;
-  }) || [];
+  const filteredList =
+    transactions?.filter((tx: any) => {
+      if (filterType === "credits") return tx.amount > 0 && tx.status !== "pending";
+      if (filterType === "debits") return tx.amount < 0 && tx.status !== "pending";
+      if (filterType === "pending") return tx.status === "pending";
+      return true;
+    }) || [];
 
-  const totalEarned = transactions?.filter((t: any) => t.amount > 0 && t.status !== "pending").reduce((acc: number, cur: any) => acc + cur.amount, 0) || 0;
-  const totalRedeemed = Math.abs(transactions?.filter((t: any) => t.amount < 0 && t.status !== "pending").reduce((acc: number, cur: any) => acc + cur.amount, 0) || 0);
+  const totalEarned =
+    transactions
+      ?.filter((t: any) => t.amount > 0 && t.status !== "pending")
+      .reduce((acc: number, cur: any) => acc + cur.amount, 0) || 0;
+  const totalRedeemed = Math.abs(
+    transactions
+      ?.filter((t: any) => t.amount < 0 && t.status !== "pending")
+      .reduce((acc: number, cur: any) => acc + cur.amount, 0) || 0,
+  );
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
@@ -138,7 +156,10 @@ function TransactionsPage() {
       <div className="pointer-events-none fixed inset-0 -z-10 ink-dots opacity-20 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
 
       {/* Header */}
-      <motion.header variants={fadeInUp} className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6">
+      <motion.header
+        variants={fadeInUp}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6"
+      >
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 border border-gold/25 text-[11px] font-bold text-gold tracking-widest uppercase">
             <History className="size-3.5" />
@@ -159,19 +180,24 @@ function TransactionsPage() {
       <motion.div variants={fadeInUp} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-3xl p-5 bg-ink-2/70 border border-hairline shadow-md backdrop-blur-xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">Current Vault</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+              Current Vault
+            </span>
             <div className="size-8 rounded-xl bg-gold/15 text-gold flex items-center justify-center border border-gold/25">
               <Wallet className="size-4" />
             </div>
           </div>
           <p className="text-2xl font-black font-mono text-gold">
-            {(profile?.points_balance || 0).toLocaleString()} <span className="text-xs font-bold">PTS</span>
+            {(profile?.points_balance || 0).toLocaleString()}{" "}
+            <span className="text-xs font-bold">PTS</span>
           </p>
         </div>
 
         <div className="rounded-3xl p-5 bg-ink-2/70 border border-hairline shadow-md backdrop-blur-xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">Total Earned</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+              Total Earned
+            </span>
             <div className="size-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center border border-emerald-500/25">
               <ArrowUpRight className="size-4" />
             </div>
@@ -183,7 +209,9 @@ function TransactionsPage() {
 
         <div className="rounded-3xl p-5 bg-ink-2/70 border border-hairline shadow-md backdrop-blur-xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">Total Redeemed</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+              Total Redeemed
+            </span>
             <div className="size-8 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center border border-rose-500/25">
               <Gift className="size-4" />
             </div>
@@ -202,7 +230,9 @@ function TransactionsPage() {
             onClick={() => setFilterType("all")}
             className={cn(
               "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
-              filterType === "all" ? "bg-gold text-ink font-black shadow-md" : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+              filterType === "all"
+                ? "bg-gold text-ink font-black shadow-md"
+                : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
             )}
           >
             All Activity ({transactions?.length || 0})
@@ -212,7 +242,9 @@ function TransactionsPage() {
             onClick={() => setFilterType("credits")}
             className={cn(
               "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
-              filterType === "credits" ? "bg-gold text-ink font-black shadow-md" : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+              filterType === "credits"
+                ? "bg-gold text-ink font-black shadow-md"
+                : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
             )}
           >
             Earnings Only
@@ -222,7 +254,9 @@ function TransactionsPage() {
             onClick={() => setFilterType("debits")}
             className={cn(
               "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
-              filterType === "debits" ? "bg-gold text-ink font-black shadow-md" : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+              filterType === "debits"
+                ? "bg-gold text-ink font-black shadow-md"
+                : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
             )}
           >
             Redemptions Only
@@ -232,7 +266,9 @@ function TransactionsPage() {
             onClick={() => setFilterType("pending")}
             className={cn(
               "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
-              filterType === "pending" ? "bg-gold text-ink font-black shadow-md" : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+              filterType === "pending"
+                ? "bg-gold text-ink font-black shadow-md"
+                : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
             )}
           >
             Pending
@@ -247,25 +283,33 @@ function TransactionsPage() {
           ) : filteredList.length ? (
             <div className="divide-y divide-hairline">
               {filteredList.map((tx: any) => {
-                const isPending = tx.status === 'pending';
+                const isPending = tx.status === "pending";
                 const isPositive = tx.amount > 0;
 
                 return (
-                  <div 
-                    key={tx.id} 
+                  <div
+                    key={tx.id}
                     className="flex items-center justify-between p-5 hover:bg-ink-3/40 transition-colors cursor-pointer group"
                     onClick={() => handleTxClick(tx)}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "size-10 rounded-2xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105",
-                        isPending 
-                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30" 
-                          : isPositive 
-                            ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" 
-                            : "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                      )}>
-                        {isPending ? <Clock className="size-4" /> : isPositive ? <ArrowUpRight className="size-4" /> : <Gift className="size-4" />}
+                      <div
+                        className={cn(
+                          "size-10 rounded-2xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105",
+                          isPending
+                            ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                            : isPositive
+                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                              : "bg-rose-500/15 text-rose-400 border-rose-500/30",
+                        )}
+                      >
+                        {isPending ? (
+                          <Clock className="size-4" />
+                        ) : isPositive ? (
+                          <ArrowUpRight className="size-4" />
+                        ) : (
+                          <Gift className="size-4" />
+                        )}
                       </div>
 
                       <div className="space-y-1">
@@ -283,15 +327,18 @@ function TransactionsPage() {
                       </div>
                     </div>
 
-                    <div className={cn(
-                      "font-black font-mono text-sm px-3.5 py-1.5 rounded-xl border",
-                      isPending 
-                        ? "bg-amber-500/15 text-amber-400 border-amber-500/30" 
-                        : isPositive 
-                          ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" 
-                          : "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                    )}>
-                      {isPending ? "" : isPositive ? "+" : ""}{tx.amount} PTS
+                    <div
+                      className={cn(
+                        "font-black font-mono text-sm px-3.5 py-1.5 rounded-xl border",
+                        isPending
+                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                          : isPositive
+                            ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                            : "bg-rose-500/15 text-rose-400 border-rose-500/30",
+                      )}
+                    >
+                      {isPending ? "" : isPositive ? "+" : ""}
+                      {tx.amount} PTS
                     </div>
                   </div>
                 );
@@ -304,8 +351,8 @@ function TransactionsPage() {
               </div>
               <p className="text-sm font-black text-ink-fg">No transactions recorded</p>
               <p className="text-xs text-ink-muted font-medium max-w-sm mx-auto">
-                {filterType !== "all" 
-                  ? "No transactions match the selected filter category." 
+                {filterType !== "all"
+                  ? "No transactions match the selected filter category."
                   : "Complete tasks or redeem rewards to build your points transaction history."}
               </p>
             </div>
@@ -313,10 +360,10 @@ function TransactionsPage() {
         </div>
       </motion.div>
 
-      <TransactionDetailModal 
-        transaction={selectedTx} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <TransactionDetailModal
+        transaction={selectedTx}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
     </motion.div>
   );

@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
+import React, { useEffect, useRef } from "react";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
 
 // Importing these as side effects since they extend videojs
-import 'videojs-contrib-ads';
-import 'videojs-ima';
-import 'videojs-ima/dist/videojs.ima.css';
+import "videojs-contrib-ads";
+import "videojs-ima";
+import "videojs-ima/dist/videojs.ima.css";
 
 // Extend Video.js type to include IMA plugin
-declare module 'video.js' {
+declare module "video.js" {
   interface Player {
     ima: (options: any) => void;
   }
@@ -21,7 +21,12 @@ interface VastPlayerProps {
   onAdStarted?: () => void;
 }
 
-const VastPlayer: React.FC<VastPlayerProps> = ({ vastTagUrl, onAdComplete, onAdError, onAdStarted }) => {
+const VastPlayer: React.FC<VastPlayerProps> = ({
+  vastTagUrl,
+  onAdComplete,
+  onAdError,
+  onAdStarted,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
@@ -34,7 +39,7 @@ const VastPlayer: React.FC<VastPlayerProps> = ({ vastTagUrl, onAdComplete, onAdE
       autoplay: true,
       muted: false,
       fluid: true,
-      preload: 'auto',
+      preload: "auto",
       responsive: true,
     });
 
@@ -58,43 +63,42 @@ const VastPlayer: React.FC<VastPlayerProps> = ({ vastTagUrl, onAdComplete, onAdE
         try {
           (player as any).ima.initializeAdDisplayContainer();
           (player as any).ima.requestAds();
-          player.off('play', startAds);
+          player.off("play", startAds);
         } catch (err) {
-          console.error('Error starting ads:', err);
+          console.error("Error starting ads:", err);
           onAdError(err);
         }
       };
 
-      player.on('play', startAds);
+      player.on("play", startAds);
 
       // IMA events
-      player.on('ads-ad-started', () => {
-        console.log('VAST: Ad started');
+      player.on("ads-ad-started", () => {
+        console.log("VAST: Ad started");
         onAdStarted?.();
       });
 
-      player.on('ads-alladscompleted', () => {
-        console.log('VAST: All ads completed');
+      player.on("ads-alladscompleted", () => {
+        console.log("VAST: All ads completed");
         onAdComplete();
       });
 
       // Also listen for content resume which usually happens after an ad finishes
-      player.on('ads-ad-ended', () => {
-        console.log('VAST: Ad ended');
+      player.on("ads-ad-ended", () => {
+        console.log("VAST: Ad ended");
       });
 
-      player.on('ads-error', (event: any) => {
-        console.error('VAST: Ads error:', event.adsError);
+      player.on("ads-error", (event: any) => {
+        console.error("VAST: Ads error:", event.adsError);
         onAdError(event.adsError);
       });
 
       // Fallback for empty VAST tags (no-fill)
-      player.on('ads-manager-loaded', () => {
-        console.log('VAST: Ads manager loaded');
+      player.on("ads-manager-loaded", () => {
+        console.log("VAST: Ads manager loaded");
       });
-
     } catch (e) {
-      console.error('VAST: Error initializing IMA:', e);
+      console.error("VAST: Error initializing IMA:", e);
       onAdError(e);
     }
 
@@ -107,9 +111,9 @@ const VastPlayer: React.FC<VastPlayerProps> = ({ vastTagUrl, onAdComplete, onAdE
 
   return (
     <div data-vjs-player className="w-full h-full">
-      <video 
-        ref={videoRef} 
-        className="video-js vjs-big-play-centered w-full h-full rounded-xl overflow-hidden" 
+      <video
+        ref={videoRef}
+        className="video-js vjs-big-play-centered w-full h-full rounded-xl overflow-hidden"
         playsInline
       />
     </div>
