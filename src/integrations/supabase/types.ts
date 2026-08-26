@@ -904,16 +904,26 @@ export type Database = {
         Args: { _username: string }
         Returns: string
       }
-      handle_admin_points_adjustment: {
-        Args: {
-          p_action_type: string
-          p_admin_id: string
-          p_amount: number
-          p_reason: string
-          p_target_user_id: string
-        }
-        Returns: undefined
-      }
+      handle_admin_points_adjustment:
+        | {
+            Args: {
+              p_action_type: string
+              p_admin_id: string
+              p_amount: number
+              p_reason: string
+              p_target_user_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_action_type: string
+              p_amount: number
+              p_reason: string
+              p_target_user_id: string
+            }
+            Returns: Json
+          }
       has_completed_social_profile: {
         Args: { _user_id: string }
         Returns: boolean
@@ -945,6 +955,16 @@ export type Database = {
             Args: { _session_id: string; _task_id: string; _user_id: string }
             Returns: Json
           }
+      redeem_reward: { Args: { _reward_id: string }; Returns: Json }
+      send_user_notification: {
+        Args: {
+          _message: string
+          _title: string
+          _type: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       submit_task: {
         Args: { _task_id: string; _user_id: string }
         Returns: Json
