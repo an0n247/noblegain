@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Coins, Loader2, Mail, Lock, User, CheckCircle2, ArrowLeft, Eye, EyeOff, Share2, Clock, RefreshCw, Sparkles, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { getClientIp } from "@/lib/session-tracking.functions";
 import { z } from "zod";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 
@@ -240,6 +241,11 @@ function AuthPage() {
     if (!validate('signup')) return;
     setLoading(true);
     try {
+      // Resolve the real client IP server-side; null when it can't be determined.
+      const signupIp = await getClientIp()
+        .then((r) => r.ip)
+        .catch(() => null);
+
       const options: any = { 
         email, 
         password,
@@ -249,7 +255,7 @@ function AuthPage() {
             full_name: fullName,
             referral_code_used: referralCode || null,
             fingerprint: (window as any)._ep_fingerprint || null,
-            ip_address: 'client_side_placeholder' // IP is usually handled by Supabase Auth metadata or server-side detection
+            ip_address: signupIp
           }
         }
       };
