@@ -18,20 +18,22 @@ export function Onboarding() {
 
   useEffect(() => {
     // Don't show onboarding on auth page
-    if (location.pathname === '/auth' || location.pathname.startsWith('/admin')) {
+    if (location.pathname === "/auth" || location.pathname.startsWith("/admin")) {
       setIsOpen(false);
       return;
     }
 
-
     const checkOnboarding = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
-      
+
       const sessionFlag = sessionStorage.getItem(`onboarding_shown_${user.id}`);
       if (sessionFlag === "true") return;
 
-      const hasSeen = typeof window !== 'undefined' ? localStorage.getItem(`onboarding_seen_${user.id}`) : null;
+      const hasSeen =
+        typeof window !== "undefined" ? localStorage.getItem(`onboarding_seen_${user.id}`) : null;
       if (!hasSeen) {
         setIsOpen(true);
         sessionStorage.setItem(`onboarding_shown_${user.id}`, "true");
@@ -42,7 +44,8 @@ export function Onboarding() {
 
   const finish = () => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user && typeof window !== 'undefined') localStorage.setItem(`onboarding_seen_${user.id}`, "true");
+      if (user && typeof window !== "undefined")
+        localStorage.setItem(`onboarding_seen_${user.id}`, "true");
       setIsOpen(false);
     });
   };
@@ -50,15 +53,18 @@ export function Onboarding() {
   const steps = [
     {
       title: "Welcome to Noble Gain!",
-      description: "Start earning points today by completing simple tasks, referring friends, and participating in our daily activities.",
+      description:
+        "Start earning points today by completing simple tasks, referring friends, and participating in our daily activities.",
     },
     {
       title: "Earn & Redeem",
-      description: "Points can be redeemed for gift cards, merchandise, and exclusive rewards. The more you earn, the better the rewards!",
+      description:
+        "Points can be redeemed for gift cards, merchandise, and exclusive rewards. The more you earn, the better the rewards!",
     },
     {
       title: "Daily Streaks",
-      description: "Log in every day to maintain your streak and earn bonus points. Don't break the chain!",
+      description:
+        "Log in every day to maintain your streak and earn bonus points. Don't break the chain!",
     },
   ];
 
@@ -75,16 +81,26 @@ export function Onboarding() {
         </DialogHeader>
         <DialogFooter className="mt-6 md:mt-10 flex flex-row items-center justify-center gap-3">
           {step > 1 && (
-            <Button variant="ghost" onClick={() => setStep(step - 1)} className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-6">
+            <Button
+              variant="ghost"
+              onClick={() => setStep(step - 1)}
+              className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-6"
+            >
               Back
             </Button>
           )}
           {step < steps.length ? (
-            <Button onClick={() => setStep(step + 1)} className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <Button
+              onClick={() => setStep(step + 1)}
+              className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
               Next
             </Button>
           ) : (
-            <Button onClick={finish} className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            <Button
+              onClick={finish}
+              className="font-black uppercase tracking-widest text-xs rounded-xl h-10 md:h-12 px-8 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
               Get Started
             </Button>
           )}

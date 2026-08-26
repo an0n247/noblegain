@@ -1,23 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/api/public/sitemap')({
+export const Route = createFileRoute("/api/public/sitemap")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const baseUrl = `${url.protocol}//${url.host}`;
-        
+
         const routes = [
-          '',
-          '/auth',
-          '/about',
-          '/earn',
-          '/redeem',
-          '/refer',
-          '/profile',
-          '/dashboard',
-          '/privacy',
-          '/terms'
+          "",
+          "/auth",
+          "/about",
+          "/earn",
+          "/redeem",
+          "/refer",
+          "/profile",
+          "/dashboard",
+          "/privacy",
+          "/terms",
         ];
 
         const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -28,15 +28,15 @@ export const Route = createFileRoute('/api/public/sitemap')({
   <url>
     <loc>${baseUrl}${route}</loc>
     <changefreq>daily</changefreq>
-    <priority>${route === '' ? '1.0' : '0.8'}</priority>
-  </url>`
+    <priority>${route === "" ? "1.0" : "0.8"}</priority>
+  </url>`,
     )
-    .join('')}
+    .join("")}
 </urlset>`;
 
         return new Response(sitemap, {
           headers: {
-            'Content-Type': 'application/xml',
+            "Content-Type": "application/xml",
           },
         });
       },

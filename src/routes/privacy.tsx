@@ -5,15 +5,23 @@ import { ShieldCheck, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
   head: () => {
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://noblegain.lovable.app';
+    const url =
+      typeof window !== "undefined" ? window.location.origin : "https://noblegain.lovable.app";
     const canonicalUrl = `${url}/privacy`;
 
     return {
       title: "Privacy Policy | Noble Gain",
       meta: [
-        { name: "description", content: "Learn how Noble Gain collects, uses, and protects your personal data. Our privacy policy outlines our commitment to your security." },
+        {
+          name: "description",
+          content:
+            "Learn how Noble Gain collects, uses, and protects your personal data. Our privacy policy outlines our commitment to your security.",
+        },
         { property: "og:title", content: "Privacy Policy | Noble Gain" },
-        { property: "og:description", content: "Your privacy is our priority. Read the Noble Gain privacy policy." },
+        {
+          property: "og:description",
+          content: "Your privacy is our priority. Read the Noble Gain privacy policy.",
+        },
         { property: "og:url", content: canonicalUrl },
         { property: "og:type", content: "website" },
         { property: "og:image", content: `${url}/logo.png` },
@@ -42,9 +50,7 @@ function PrivacyPage() {
             <h1 className="text-balance text-4xl sm:text-5xl font-black tracking-[-0.04em] text-ink-fg">
               Privacy Policy
             </h1>
-            <p className="mt-3 text-sm text-ink-muted">
-              Last updated: August 2026
-            </p>
+            <p className="mt-3 text-sm text-ink-muted">Last updated: August 2026</p>
           </div>
         </section>
 
@@ -56,7 +62,10 @@ function PrivacyPage() {
                   1. Overview & Commitment
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  Welcome to Noble Gain. We respect your privacy and are committed to safeguarding your personal information. This Privacy Policy details how we collect, store, utilize, and protect your data when you access our web application, participate in reward opportunities, and manage your account balance.
+                  Welcome to Noble Gain. We respect your privacy and are committed to safeguarding
+                  your personal information. This Privacy Policy details how we collect, store,
+                  utilize, and protect your data when you access our web application, participate in
+                  reward opportunities, and manage your account balance.
                 </p>
               </section>
 
@@ -65,13 +74,27 @@ function PrivacyPage() {
                   2. Information We Collect
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  To provide seamless reward tracking, anti-abuse security, and payout fulfillment, we may collect the following categories of data:
+                  To provide seamless reward tracking, anti-abuse security, and payout fulfillment,
+                  we may collect the following categories of data:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 text-ink-muted">
-                  <li><strong className="text-ink-fg">Account Identification:</strong> Email address, user identifier, and public profile handle.</li>
-                  <li><strong className="text-ink-fg">Activity & Task Data:</strong> Task submission proofs, screenshots, referral clicks, daily login streaks, and point logs.</li>
-                  <li><strong className="text-ink-fg">Technical & Device Metadata:</strong> IP address, browser type, device resolution, and approximate timezone used solely for anti-fraud detection and duplicate account prevention.</li>
-                  <li><strong className="text-ink-fg">Redemption Details:</strong> Payout destination addresses (e.g. gift card delivery email or payment identifier).</li>
+                  <li>
+                    <strong className="text-ink-fg">Account Identification:</strong> Email address,
+                    user identifier, and public profile handle.
+                  </li>
+                  <li>
+                    <strong className="text-ink-fg">Activity & Task Data:</strong> Task submission
+                    proofs, screenshots, referral clicks, daily login streaks, and point logs.
+                  </li>
+                  <li>
+                    <strong className="text-ink-fg">Technical & Device Metadata:</strong> IP
+                    address, browser type, device resolution, and approximate timezone used solely
+                    for anti-fraud detection and duplicate account prevention.
+                  </li>
+                  <li>
+                    <strong className="text-ink-fg">Redemption Details:</strong> Payout destination
+                    addresses (e.g. gift card delivery email or payment identifier).
+                  </li>
                 </ul>
               </section>
 
@@ -86,7 +109,10 @@ function PrivacyPage() {
                   <li>Authenticate and maintain your personal account.</li>
                   <li>Verify completion of reward tasks and calculate accurate point balances.</li>
                   <li>Process, review, and fulfill reward redemption requests.</li>
-                  <li>Protect our community and partners against botting, duplicate accounts, and fraudulent activity.</li>
+                  <li>
+                    Protect our community and partners against botting, duplicate accounts, and
+                    fraudulent activity.
+                  </li>
                   <li>Provide critical service updates and support assistance.</li>
                 </ul>
               </section>
@@ -96,7 +122,9 @@ function PrivacyPage() {
                   4. Data Protection & Security
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  We implement database-level row access policies (RLS), end-to-end encryption in transit (HTTPS/TLS), and restricted access protocols. Your account credentials and tokens are encrypted, and passwords are never stored in plaintext.
+                  We implement database-level row access policies (RLS), end-to-end encryption in
+                  transit (HTTPS/TLS), and restricted access protocols. Your account credentials and
+                  tokens are encrypted, and passwords are never stored in plaintext.
                 </p>
               </section>
 
@@ -105,7 +133,9 @@ function PrivacyPage() {
                   5. Your Data Rights
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  You have the right to request a copy of your activity data, update your account settings, or request account closure and deletion of associated personal data at any time through your Profile settings or by contacting our support team.
+                  You have the right to request a copy of your activity data, update your account
+                  settings, or request account closure and deletion of associated personal data at
+                  any time through your Profile settings or by contacting our support team.
                 </p>
               </section>
 

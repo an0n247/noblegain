@@ -25,20 +25,23 @@ import { ensureBucketsExist } from "@/utils/storage-init";
 import { VideoAdInterstitial } from "@/components/VideoAdInterstitial";
 import { recordClientSession } from "@/lib/session-tracking.functions";
 
-
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="flex flex-col items-center text-center max-w-md">
-        <img src="/logo.png" alt="Noble Gain" className="h-24 w-24 object-contain animate-pulse mb-8" />
-        
+        <img
+          src="/logo.png"
+          alt="Noble Gain"
+          className="h-24 w-24 object-contain animate-pulse mb-8"
+        />
+
         <h1 className="text-8xl font-black text-primary tracking-tighter mb-2">404</h1>
         <h2 className="text-2xl font-black uppercase tracking-tight text-foreground mb-4">
           Lost in the vault?
         </h2>
         <p className="text-muted-foreground font-medium mb-10 leading-relaxed">
-          The page you're looking for doesn't exist or has been moved to another section of the platform.
+          The page you're looking for doesn't exist or has been moved to another section of the
+          platform.
         </p>
 
         <Link
@@ -48,7 +51,7 @@ function NotFoundComponent() {
           Back to Dashboard
           <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
         </Link>
-        
+
         <div className="mt-12 flex items-center gap-2 font-black text-xs text-muted-foreground/40 uppercase tracking-[0.2em]">
           <span>Noble Gain</span>
           <span className="h-1 w-1 rounded-full bg-muted-foreground/20" />
@@ -71,7 +74,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="flex flex-col items-center animate-pulse">
         <img src="/logo.png" alt="Noble Gain" className="h-20 w-20 object-contain mb-4" />
         <div className="flex items-center gap-2 font-black text-2xl tracking-tighter uppercase">
-          <span className="text-foreground">Noble <span className="text-[#e6c17a]">Gain</span></span>
+          <span className="text-foreground">
+            Noble <span className="text-[#e6c17a]">Gain</span>
+          </span>
         </div>
         <p className="mt-4 text-sm font-bold text-muted-foreground uppercase tracking-widest">
           Loading your experience...
@@ -104,18 +109,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Domain redirects disabled - site works independently on all URLs
   },
   head: () => {
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://noblegain.qd.je';
-    const canonicalUrl = typeof window !== 'undefined' ? `${url}${window.location.pathname}` : url;
+    const url = typeof window !== "undefined" ? window.location.origin : "https://noblegain.qd.je";
+    const canonicalUrl = typeof window !== "undefined" ? `${url}${window.location.pathname}` : url;
 
     return {
       meta: [
         { charSet: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+        },
         { title: "Noble Gain — Reward Your Time" },
-        { name: "description", content: "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes." },
+        {
+          name: "description",
+          content:
+            "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes.",
+        },
         { name: "author", content: "Noble Gain" },
         { property: "og:title", content: "Noble Gain — Reward Your Time" },
-        { property: "og:description", content: "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes." },
+        {
+          property: "og:description",
+          content:
+            "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes.",
+        },
         { property: "og:type", content: "website" },
         { property: "og:url", content: canonicalUrl },
         { property: "og:image", content: `${url}/logo.png` },
@@ -142,27 +158,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "Noble Gain",
-            "url": url,
-            "logo": `${url}/logo.png`,
-            "description": "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes."
-          })
+            name: "Noble Gain",
+            url: url,
+            logo: `${url}/logo.png`,
+            description:
+              "The ultimate rewards platform. Earn points for simple tasks, refer friends, and redeem for amazing prizes.",
+          }),
         },
         {
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Noble Gain",
-            "url": url,
-            "potentialAction": {
+            name: "Noble Gain",
+            url: url,
+            potentialAction: {
               "@type": "SearchAction",
-              "target": `${url}/search?q={search_term_string}`,
-              "query-input": "required name=search_term_string"
-            }
-          })
-        }
-      ]
+              target: `${url}/search?q={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        },
+      ],
     };
   },
   shellComponent: RootShell,
@@ -195,7 +212,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     // Generate simple fingerprint for basic fraud detection
     if (!(window as any)._ep_fingerprint) {
@@ -204,19 +221,21 @@ function RootComponent() {
         window.screen.width,
         window.screen.height,
         new Date().getTimezoneOffset(),
-        window.navigator.language
-      ].join('|');
-      
+        window.navigator.language,
+      ].join("|");
+
       let hash = 0;
       for (let i = 0; i < fp.length; i++) {
         const char = fp.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash;
       }
       (window as any)._ep_fingerprint = Math.abs(hash).toString(16);
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change in root:", event, session?.user?.id);
 
       if (session?.user) {
@@ -226,42 +245,40 @@ function RootComponent() {
           data: { fingerprint: (window as any)._ep_fingerprint ?? null },
         }).catch((err) => console.error("Failed to record session:", err));
       }
-      
-      if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
+
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
 
       router.invalidate();
 
-      if (event === 'SIGNED_OUT') {
+      if (event === "SIGNED_OUT") {
         const currentPath = window.location.pathname;
-        const publicPages = ['/', '/auth', '/landing', '/about', '/privacy', '/terms'];
+        const publicPages = ["/", "/auth", "/landing", "/about", "/privacy", "/terms"];
         if (!publicPages.includes(currentPath)) {
-          router.navigate({ to: '/auth' });
+          router.navigate({ to: "/auth" });
         }
       }
     });
 
     // Clean up flags from the previous transient-session implementation.
-    localStorage.removeItem('noble-gain-session-transient');
-    sessionStorage.removeItem('noble-gain-session-active');
+    localStorage.removeItem("noble-gain-session-transient");
+    sessionStorage.removeItem("noble-gain-session-active");
 
     return () => subscription.unsubscribe();
   }, [router]);
 
-
   useEffect(() => {
-    ensureBucketsExist().catch(err => console.error("Bucket init failed:", err));
+    ensureBucketsExist().catch((err) => console.error("Bucket init failed:", err));
   }, []);
 
   useEffect(() => {
-
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const refCode = params.get('ref');
-    
+    const refCode = params.get("ref");
+
     if (refCode) {
       const trackClick = async () => {
-        const { error } = await supabase.rpc('increment_referral_clicks', {
-          target_referral_code: refCode
+        const { error } = await supabase.rpc("increment_referral_clicks", {
+          target_referral_code: refCode,
         });
         if (error) console.error("Error tracking referral click:", error);
       };
@@ -272,17 +289,30 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="noble-gain-theme">
-        <div className={cn(
-          "flex min-h-screen relative w-full max-w-full flex-col",
-          !isAuthPage && !isPublicPage && "bg-background text-foreground"
-        )}>
+        <div
+          className={cn(
+            "flex min-h-screen relative w-full max-w-full flex-col",
+            !isAuthPage && !isPublicPage && "bg-background text-foreground",
+          )}
+        >
           {!isAuthPage && !isPublicPage && <Navigation />}
           {!isAuthPage && !isPublicPage && <MobileTabBar />}
-          <main className={cn(
-            "flex-1 transition-all duration-300 w-full flex flex-col",
-            !isPublicPage && !isAuthPage && "md:ml-72 w-full md:w-[calc(100%-18rem)] pb-20 md:pb-0"
-          )}>
-            <div className={cn("flex-1 w-full", !isPublicPage && !isAuthPage && "pt-24 md:pt-28 pb-12 px-4 md:px-8 max-w-7xl mx-auto")}>
+          <main
+            className={cn(
+              "flex-1 transition-all duration-300 w-full flex flex-col",
+              !isPublicPage &&
+                !isAuthPage &&
+                "md:ml-72 w-full md:w-[calc(100%-18rem)] pb-20 md:pb-0",
+            )}
+          >
+            <div
+              className={cn(
+                "flex-1 w-full",
+                !isPublicPage &&
+                  !isAuthPage &&
+                  "pt-24 md:pt-28 pb-12 px-4 md:px-8 max-w-7xl mx-auto",
+              )}
+            >
               <Outlet />
             </div>
           </main>
@@ -291,7 +321,6 @@ function RootComponent() {
         <Onboarding />
         <VideoAdInterstitial />
       </ThemeProvider>
-
     </QueryClientProvider>
   );
 }

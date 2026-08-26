@@ -1,9 +1,16 @@
-import React, { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Crop, ZoomIn } from 'lucide-react';
+import React, { useState, useCallback } from "react";
+import Cropper from "react-easy-crop";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Crop, ZoomIn } from "lucide-react";
 
 export interface ImageCropperProps {
   image?: string;
@@ -15,14 +22,14 @@ export interface ImageCropperProps {
   isOpen?: boolean;
 }
 
-export function ImageCropper({ 
-  image, 
-  imageSrc, 
-  onCropComplete, 
-  onCancel, 
-  onClose, 
-  open, 
-  isOpen 
+export function ImageCropper({
+  image,
+  imageSrc,
+  onCropComplete,
+  onCancel,
+  onClose,
+  open,
+  isOpen,
 }: ImageCropperProps) {
   const activeImage = image || imageSrc || "";
   const isModalOpen = open ?? isOpen ?? false;
@@ -47,19 +54,16 @@ export function ImageCropper({
   const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
       const img = new Image();
-      img.addEventListener('load', () => resolve(img));
-      img.addEventListener('error', (error) => reject(error));
-      img.setAttribute('crossOrigin', 'anonymous');
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (error) => reject(error));
+      img.setAttribute("crossOrigin", "anonymous");
       img.src = url;
     });
 
-  const getCroppedImg = async (
-    src: string,
-    pixelCrop: any
-  ): Promise<Blob | null> => {
+  const getCroppedImg = async (src: string, pixelCrop: any): Promise<Blob | null> => {
     const img = await createImage(src);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
     if (!ctx || !pixelCrop) return null;
 
@@ -75,13 +79,17 @@ export function ImageCropper({
       0,
       0,
       pixelCrop.width,
-      pixelCrop.height
+      pixelCrop.height,
     );
 
     return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob);
-      }, 'image/jpeg', 0.92);
+      canvas.toBlob(
+        (blob) => {
+          resolve(blob);
+        },
+        "image/jpeg",
+        0.92,
+      );
     });
   };
 
@@ -144,15 +152,15 @@ export function ImageCropper({
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0 flex flex-row justify-end">
-          <Button 
-            variant="outline" 
-            onClick={handleClose} 
+          <Button
+            variant="outline"
+            onClick={handleClose}
             className="rounded-xl font-bold h-11 border-hairline bg-ink hover:bg-ink-3 text-ink-fg text-xs px-5 cursor-pointer"
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleCrop} 
+          <Button
+            onClick={handleCrop}
             className="rounded-xl font-black h-11 bg-gold text-ink hover:bg-gold-soft text-xs px-6 cursor-pointer shadow-md shadow-gold/10 ml-2"
           >
             Apply & Upload

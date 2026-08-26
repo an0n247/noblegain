@@ -1,23 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { 
-  User, 
-  Bell, 
-  Shield, 
-  LogOut, 
-  Camera, 
-  Check, 
-  Loader2, 
-  Sliders, 
-  Sparkles, 
-  Lock, 
-  Smartphone, 
+import {
+  User,
+  Bell,
+  Shield,
+  LogOut,
+  Camera,
+  Check,
+  Loader2,
+  Sliders,
+  Sparkles,
+  Lock,
+  Smartphone,
   Mail,
   ExternalLink,
   ChevronRight,
   ShieldCheck,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -33,9 +33,16 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     title: "Account Settings & Preferences | Noble Gain",
     meta: [
-      { name: "description", content: "Customize your Noble Gain experience. Manage notification preferences, security settings, and account privacy." },
+      {
+        name: "description",
+        content:
+          "Customize your Noble Gain experience. Manage notification preferences, security settings, and account privacy.",
+      },
       { property: "og:title", content: "Settings | Noble Gain" },
-      { property: "og:description", content: "Tailor your earning experience and manage your account security." },
+      {
+        property: "og:description",
+        content: "Tailor your earning experience and manage your account security.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,19 +53,19 @@ export const Route = createFileRoute("/_authenticated/settings")({
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] } 
-  }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] },
+  },
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { staggerChildren: 0.06 } 
-  }
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
 };
 
 function SettingsPage() {
@@ -69,7 +76,9 @@ function SettingsPage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return null;
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       return data;
@@ -78,12 +87,11 @@ function SettingsPage() {
 
   const updateProfile = useMutation({
     mutationFn: async (updates: any) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", user.id);
+      const { error } = await supabase.from("profiles").update(updates).eq("id", user.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -106,10 +114,12 @@ function SettingsPage() {
       }
 
       setIsUploading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const fileExt = file.name.split('.').pop() || "jpg";
+      const fileExt = file.name.split(".").pop() || "jpg";
       const filePath = `${user.id}/${Date.now()}.${fileExt}`;
 
       const url = await uploadImageWithFallback({
@@ -144,7 +154,7 @@ function SettingsPage() {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
@@ -154,7 +164,10 @@ function SettingsPage() {
       <div className="pointer-events-none fixed inset-0 -z-10 ink-dots opacity-20 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
 
       {/* Header */}
-      <motion.header variants={fadeInUp} className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6">
+      <motion.header
+        variants={fadeInUp}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-hairline/70 pb-6"
+      >
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/10 border border-gold/25 text-[11px] font-bold text-gold tracking-widest uppercase">
             <Sliders className="size-3.5" />
@@ -170,7 +183,11 @@ function SettingsPage() {
           </p>
         </div>
 
-        <Button asChild variant="outline" className="rounded-xl font-bold h-11 px-5 text-xs border-hairline bg-ink-2/60 hover:bg-ink-3 text-ink-fg shrink-0 shadow-sm">
+        <Button
+          asChild
+          variant="outline"
+          className="rounded-xl font-bold h-11 px-5 text-xs border-hairline bg-ink-2/60 hover:bg-ink-3 text-ink-fg shrink-0 shadow-sm"
+        >
           <Link to="/profile">
             <User className="size-4 mr-1.5 text-gold" />
             <span>View Public Profile</span>
@@ -190,13 +207,17 @@ function SettingsPage() {
                   {profile?.full_name?.[0] || profile?.email?.[0] || "?"}
                 </AvatarFallback>
               </Avatar>
-              <label 
+              <label
                 htmlFor="avatar-upload"
                 className="absolute bottom-0 right-0 p-2 bg-gold text-ink rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform font-bold"
                 title="Change Avatar"
               >
-                {isUploading ? <Loader2 className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
-                <input 
+                {isUploading ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Camera className="size-3.5" />
+                )}
+                <input
                   id="avatar-upload"
                   type="file"
                   accept="image/*"
@@ -207,7 +228,9 @@ function SettingsPage() {
               </label>
             </div>
             <div>
-              <h3 className="font-black text-base text-ink-fg">{profile?.full_name || "Noble Member"}</h3>
+              <h3 className="font-black text-base text-ink-fg">
+                {profile?.full_name || "Noble Member"}
+              </h3>
               <p className="text-xs text-ink-muted font-medium truncate">{profile?.email}</p>
             </div>
           </div>
@@ -221,7 +244,7 @@ function SettingsPage() {
                 "w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all cursor-pointer",
                 activeSection === "notifications"
                   ? "bg-gold text-ink font-black shadow-sm"
-                  : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+                  : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
               )}
             >
               <span className="flex items-center gap-2.5">
@@ -238,7 +261,7 @@ function SettingsPage() {
                 "w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all cursor-pointer",
                 activeSection === "security"
                   ? "bg-gold text-ink font-black shadow-sm"
-                  : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+                  : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
               )}
             >
               <span className="flex items-center gap-2.5">
@@ -248,7 +271,7 @@ function SettingsPage() {
               <ChevronRight className="size-3.5 opacity-60" />
             </button>
 
-            <button 
+            <button
               type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
@@ -265,7 +288,9 @@ function SettingsPage() {
             <div className="rounded-3xl border border-hairline bg-ink-2/70 p-6 sm:p-7 shadow-lg backdrop-blur-xl space-y-6">
               <div className="border-b border-hairline pb-4">
                 <h3 className="text-lg font-black text-ink-fg">Notification Preferences</h3>
-                <p className="text-xs text-ink-muted font-medium">Control when and how Noble Gain sends alerts</p>
+                <p className="text-xs text-ink-muted font-medium">
+                  Control when and how Noble Gain sends alerts
+                </p>
               </div>
 
               <div className="space-y-5">
@@ -279,9 +304,11 @@ function SettingsPage() {
                       Receive weekly earning digests and reward redemption codes via email.
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={profile?.email_notifications ?? true}
-                    onCheckedChange={(checked) => updateProfile.mutate({ email_notifications: checked })}
+                    onCheckedChange={(checked) =>
+                      updateProfile.mutate({ email_notifications: checked })
+                    }
                     disabled={updateProfile.isPending}
                     className="data-[state=checked]:bg-gold"
                   />
@@ -297,9 +324,11 @@ function SettingsPage() {
                       Receive instant real-time notifications when high-yield tasks go live.
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={profile?.push_notifications ?? true}
-                    onCheckedChange={(checked) => updateProfile.mutate({ push_notifications: checked })}
+                    onCheckedChange={(checked) =>
+                      updateProfile.mutate({ push_notifications: checked })
+                    }
                     disabled={updateProfile.isPending}
                     className="data-[state=checked]:bg-gold"
                   />
@@ -312,16 +341,21 @@ function SettingsPage() {
             <div className="rounded-3xl border border-hairline bg-ink-2/70 p-6 sm:p-7 shadow-lg backdrop-blur-xl space-y-6">
               <div className="border-b border-hairline pb-4">
                 <h3 className="text-lg font-black text-ink-fg">Security & Protection</h3>
-                <p className="text-xs text-ink-muted font-medium">Manage your cryptographic session and password</p>
+                <p className="text-xs text-ink-muted font-medium">
+                  Manage your cryptographic session and password
+                </p>
               </div>
 
               <div className="space-y-4">
                 <div className="rounded-2xl p-4 bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-3">
                   <ShieldCheck className="size-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <p className="text-xs font-bold text-emerald-400">Account Protected with SSL/TLS</p>
+                    <p className="text-xs font-bold text-emerald-400">
+                      Account Protected with SSL/TLS
+                    </p>
                     <p className="text-xs text-ink-muted font-medium">
-                      All your point transactions, referrals, and credentials are encrypted end-to-end.
+                      All your point transactions, referrals, and credentials are encrypted
+                      end-to-end.
                     </p>
                   </div>
                 </div>
@@ -329,9 +363,14 @@ function SettingsPage() {
                 <div className="p-4 rounded-2xl bg-ink border border-hairline flex items-center justify-between">
                   <div className="space-y-0.5">
                     <p className="text-xs font-bold text-ink-fg">Change Password</p>
-                    <p className="text-xs text-ink-muted font-medium">Update your security passkey from your profile page.</p>
+                    <p className="text-xs text-ink-muted font-medium">
+                      Update your security passkey from your profile page.
+                    </p>
                   </div>
-                  <Button asChild className="rounded-xl font-bold h-10 px-4 text-xs bg-gold text-ink hover:bg-gold-soft shadow-sm">
+                  <Button
+                    asChild
+                    className="rounded-xl font-bold h-10 px-4 text-xs bg-gold text-ink hover:bg-gold-soft shadow-sm"
+                  >
                     <Link to="/profile">
                       Go to Profile
                       <ArrowRight className="size-3.5 ml-1.5" />

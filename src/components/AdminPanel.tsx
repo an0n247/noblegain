@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  Users, 
-  Coins, 
-  ShoppingBag, 
-  TrendingUp, 
-  ArrowUpRight, 
+import {
+  Users,
+  Coins,
+  ShoppingBag,
+  TrendingUp,
+  ArrowUpRight,
   ArrowDownRight,
   Clock,
   Loader2,
@@ -13,20 +13,10 @@ import {
   ChevronDown,
   Sparkles,
   Shield,
-  Sliders
+  Sliders,
 } from "lucide-react";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { 
-  Tabs, 
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { RedemptionsManager } from "./admin/RedemptionsManager";
 import { RewardsManager } from "./admin/RewardsManager";
@@ -49,25 +39,25 @@ import { motion } from "framer-motion";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 16 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] } 
-  }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number] },
+  },
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1, 
-    transition: { staggerChildren: 0.06 } 
-  }
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
 };
 
 export function AdminPanel() {
   const { role, isAdmin } = useAuth();
   const queryClient = useQueryClient();
-  
+
   const { data: permissions } = useQuery({
     queryKey: ["rolePermissions", role],
     queryFn: async () => {
@@ -77,7 +67,7 @@ export function AdminPanel() {
         .select("tab_name")
         .eq("role", role)
         .eq("is_enabled", true);
-      return data?.map(p => p.tab_name) || [];
+      return data?.map((p) => p.tab_name) || [];
     },
     enabled: !!role,
   });
@@ -89,30 +79,49 @@ export function AdminPanel() {
       const thirtyDaysAgo = subDays(startOfDay(now), 30);
       const sixtyDaysAgo = subDays(startOfDay(now), 60);
 
-      const [
-        usersRes, 
-        usersPrevRes,
-        pointsRes, 
-        pointsPrevRes,
-        redemptionsRes,
-        redemptionsPrevRes
-      ] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).lt("created_at", thirtyDaysAgo.toISOString()),
-        supabase.from("points_transactions").select("amount").gte("created_at", thirtyDaysAgo.toISOString()),
-        supabase.from("points_transactions").select("amount").gte("created_at", sixtyDaysAgo.toISOString()).lt("created_at", thirtyDaysAgo.toISOString()),
-        supabase.from("redemptions").select("id", { count: "exact", head: true }).gte("created_at", thirtyDaysAgo.toISOString()),
-        supabase.from("redemptions").select("id", { count: "exact", head: true }).gte("created_at", sixtyDaysAgo.toISOString()).lt("created_at", thirtyDaysAgo.toISOString()),
-      ]);
+      const [usersRes, usersPrevRes, pointsRes, pointsPrevRes, redemptionsRes, redemptionsPrevRes] =
+        await Promise.all([
+          supabase.from("profiles").select("id", { count: "exact", head: true }),
+          supabase
+            .from("profiles")
+            .select("id", { count: "exact", head: true })
+            .lt("created_at", thirtyDaysAgo.toISOString()),
+          supabase
+            .from("points_transactions")
+            .select("amount")
+            .gte("created_at", thirtyDaysAgo.toISOString()),
+          supabase
+            .from("points_transactions")
+            .select("amount")
+            .gte("created_at", sixtyDaysAgo.toISOString())
+            .lt("created_at", thirtyDaysAgo.toISOString()),
+          supabase
+            .from("redemptions")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", thirtyDaysAgo.toISOString()),
+          supabase
+            .from("redemptions")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", sixtyDaysAgo.toISOString())
+            .lt("created_at", thirtyDaysAgo.toISOString()),
+        ]);
 
       const totalUsers = usersRes.count || 0;
       const prevUsers = usersPrevRes.count || 0;
-      
-      const pointsIssued = pointsRes.data?.reduce((acc, curr) => acc + (curr.amount > 0 ? curr.amount : 0), 0) || 0;
-      const prevPointsIssued = pointsPrevRes.data?.reduce((acc, curr) => acc + (curr.amount > 0 ? curr.amount : 0), 0) || 0;
 
-      const pointsSpent = Math.abs(pointsRes.data?.reduce((acc, curr) => acc + (curr.amount < 0 ? curr.amount : 0), 0) || 0);
-      const prevPointsSpent = Math.abs(pointsPrevRes.data?.reduce((acc, curr) => acc + (curr.amount < 0 ? curr.amount : 0), 0) || 0);
+      const pointsIssued =
+        pointsRes.data?.reduce((acc, curr) => acc + (curr.amount > 0 ? curr.amount : 0), 0) || 0;
+      const prevPointsIssued =
+        pointsPrevRes.data?.reduce((acc, curr) => acc + (curr.amount > 0 ? curr.amount : 0), 0) ||
+        0;
+
+      const pointsSpent = Math.abs(
+        pointsRes.data?.reduce((acc, curr) => acc + (curr.amount < 0 ? curr.amount : 0), 0) || 0,
+      );
+      const prevPointsSpent = Math.abs(
+        pointsPrevRes.data?.reduce((acc, curr) => acc + (curr.amount < 0 ? curr.amount : 0), 0) ||
+          0,
+      );
 
       const totalRedemptions = redemptionsRes.count || 0;
       const prevRedemptions = redemptionsPrevRes.count || 0;
@@ -122,23 +131,25 @@ export function AdminPanel() {
         const diff = current - previous;
         const percentage = Math.round((Math.abs(diff) / previous) * 100);
         return {
-          trend: `${diff >= 0 ? '+' : '-'}${percentage}%`,
-          up: diff >= 0
+          trend: `${diff >= 0 ? "+" : "-"}${percentage}%`,
+          up: diff >= 0,
         };
       };
 
       return {
         totalUsers,
-        totalPoints: pointsIssued, 
+        totalPoints: pointsIssued,
         pointsSpent,
         totalRedemptions,
-        redemptionRate: usersRes.count ? ((redemptionsRes.count || 0) / usersRes.count).toFixed(2) : 0,
+        redemptionRate: usersRes.count
+          ? ((redemptionsRes.count || 0) / usersRes.count).toFixed(2)
+          : 0,
         trends: {
           users: calculateTrend(totalUsers, prevUsers),
           points: calculateTrend(pointsIssued, prevPointsIssued),
           spent: calculateTrend(pointsSpent, prevPointsSpent),
-          redemptions: calculateTrend(totalRedemptions, prevRedemptions)
-        }
+          redemptions: calculateTrend(totalRedemptions, prevRedemptions),
+        },
       };
     },
   });
@@ -146,7 +157,11 @@ export function AdminPanel() {
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
       const savedTab = localStorage.getItem("noblegain_admin_last_tab");
-      return savedTab === "fraud" ? "audit" : savedTab === "verifications" ? "approvals" : (savedTab || "users");
+      return savedTab === "fraud"
+        ? "audit"
+        : savedTab === "verifications"
+          ? "approvals"
+          : savedTab || "users";
     }
     return "users";
   });
@@ -167,7 +182,7 @@ export function AdminPanel() {
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["adminStats"] });
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -178,7 +193,7 @@ export function AdminPanel() {
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["adminStats"] });
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -189,7 +204,7 @@ export function AdminPanel() {
         },
         () => {
           queryClient.invalidateQueries({ queryKey: ["adminStats"] });
-        }
+        },
       )
       .subscribe();
 
@@ -207,10 +222,10 @@ export function AdminPanel() {
     { value: "redemptions", icon: Clock, label: "Redemptions" },
     { value: "referrals", icon: Users2, label: "Referrals" },
     { value: "audit", icon: ClipboardList, label: "Audit Logs" },
-    { value: "settings", icon: isAdmin ? Settings : Lock, label: "Settings" }
+    { value: "settings", icon: isAdmin ? Settings : Lock, label: "Settings" },
   ];
 
-  const filteredTabs = tabs.filter(tab => {
+  const filteredTabs = tabs.filter((tab) => {
     if (isAdmin) return true;
     if (!permissions) return false;
     return tab.value === "audit"
@@ -229,7 +244,7 @@ export function AdminPanel() {
       iconBg: "bg-gold/15 border-gold/25",
       trend: stats?.trends.users.trend || "0%",
       trendUp: stats?.trends.users.up ?? true,
-      description: "Active members"
+      description: "Active members",
     },
     {
       title: "Points Distributed",
@@ -239,7 +254,7 @@ export function AdminPanel() {
       iconBg: "bg-emerald-500/15 border-emerald-500/25",
       trend: stats?.trends.points.trend || "0%",
       trendUp: stats?.trends.points.up ?? true,
-      description: "Last 30 days"
+      description: "Last 30 days",
     },
     {
       title: "Points Redeemed",
@@ -249,7 +264,7 @@ export function AdminPanel() {
       iconBg: "bg-purple-500/15 border-purple-500/25",
       trend: stats?.trends.spent.trend || "0%",
       trendUp: stats?.trends.spent.up ?? true,
-      description: "Vault claims"
+      description: "Vault claims",
     },
     {
       title: "Total Redemptions",
@@ -259,8 +274,8 @@ export function AdminPanel() {
       iconBg: "bg-blue-500/15 border-blue-500/25",
       trend: stats?.trends.redemptions.trend || "0%",
       trendUp: stats?.trends.redemptions.up ?? true,
-      description: "Completed orders"
-    }
+      description: "Completed orders",
+    },
   ];
 
   if (isLoading) {
@@ -272,24 +287,33 @@ export function AdminPanel() {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
       className="space-y-8"
     >
       {/* 4 Bento KPI Metric Cards */}
-      <motion.div variants={fadeInUp} className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        variants={fadeInUp}
+        className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      >
         {statCards.map((stat) => (
-          <div 
-            key={stat.title} 
+          <div
+            key={stat.title}
             className="rounded-3xl p-5 bg-ink-2/70 border border-hairline shadow-md backdrop-blur-xl group hover:border-gold/30 transition-all duration-300 space-y-3"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">
                 {stat.title}
               </span>
-              <div className={cn("size-8 rounded-xl flex items-center justify-center border", stat.iconBg, stat.iconColor)}>
+              <div
+                className={cn(
+                  "size-8 rounded-xl flex items-center justify-center border",
+                  stat.iconBg,
+                  stat.iconColor,
+                )}
+              >
                 <stat.icon className="size-4" />
               </div>
             </div>
@@ -299,18 +323,22 @@ export function AdminPanel() {
                 {stat.value}
               </div>
               <div className="flex items-center gap-2 mt-1.5">
-                <span className={cn(
-                  "flex items-center text-[10px] font-black px-2 py-0.5 rounded-md border",
-                  stat.trendUp 
-                    ? "text-emerald-400 bg-emerald-500/15 border-emerald-500/30" 
-                    : "text-rose-400 bg-rose-500/15 border-rose-500/30"
-                )}>
-                  {stat.trendUp ? <ArrowUpRight className="size-3 mr-0.5" /> : <ArrowDownRight className="size-3 mr-0.5" />}
+                <span
+                  className={cn(
+                    "flex items-center text-[10px] font-black px-2 py-0.5 rounded-md border",
+                    stat.trendUp
+                      ? "text-emerald-400 bg-emerald-500/15 border-emerald-500/30"
+                      : "text-rose-400 bg-rose-500/15 border-rose-500/30",
+                  )}
+                >
+                  {stat.trendUp ? (
+                    <ArrowUpRight className="size-3 mr-0.5" />
+                  ) : (
+                    <ArrowDownRight className="size-3 mr-0.5" />
+                  )}
                   {stat.trend}
                 </span>
-                <p className="text-[11px] text-ink-muted font-medium">
-                  {stat.description}
-                </p>
+                <p className="text-[11px] text-ink-muted font-medium">{stat.description}</p>
               </div>
             </div>
           </div>
@@ -332,7 +360,7 @@ export function AdminPanel() {
                   "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0",
                   isActive
                     ? "bg-gold text-ink font-black shadow-md shadow-gold/10"
-                    : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60"
+                    : "text-ink-muted hover:text-ink-fg hover:bg-ink-3/60",
                 )}
               >
                 <tab.icon className={cn("size-3.5", isActive ? "text-ink" : "text-gold/80")} />
@@ -344,21 +372,21 @@ export function AdminPanel() {
 
         {/* Tab Panels */}
         <div className="pt-2">
-          {activeTab === 'analytics' && <AnalyticsView />}
-          {activeTab === 'users' && <UsersManager />}
-          {activeTab === 'tasks' && <TasksManager />}
-          {activeTab === 'approvals' && <TaskSubmissions />}
-          {activeTab === 'rewards' && <RewardsManager />}
-          {activeTab === 'redemptions' && <RedemptionsManager />}
-          {activeTab === 'referrals' && <ReferralsManager />}
-          {activeTab === 'audit' && (
+          {activeTab === "analytics" && <AnalyticsView />}
+          {activeTab === "users" && <UsersManager />}
+          {activeTab === "tasks" && <TasksManager />}
+          {activeTab === "approvals" && <TaskSubmissions />}
+          {activeTab === "rewards" && <RewardsManager />}
+          {activeTab === "redemptions" && <RedemptionsManager />}
+          {activeTab === "referrals" && <ReferralsManager />}
+          {activeTab === "audit" && (
             <div className="space-y-8">
               <FraudManager />
               <PointsAuditLogs />
               <AuditLogs />
             </div>
           )}
-          {activeTab === 'settings' && <PlatformSettings />}
+          {activeTab === "settings" && <PlatformSettings />}
         </div>
       </motion.div>
     </motion.div>

@@ -8,7 +8,9 @@ import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   loader: async ({ location }) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       throw redirect({
@@ -16,13 +18,16 @@ export const Route = createFileRoute("/_authenticated/admin")({
         search: { redirect: location.pathname },
       });
     }
-    
+
     return { userId: user.id };
   },
   head: () => ({
     title: "Master Admin Console | Noble Gain",
     meta: [
-      { name: "description", content: "Comprehensive administrative control center for Noble Gain management." },
+      {
+        name: "description",
+        content: "Comprehensive administrative control center for Noble Gain management.",
+      },
     ],
   }),
   component: AdminRouteComponent,
@@ -35,11 +40,11 @@ function AdminRouteComponent() {
     queryKey: ["admin-role-check", userId],
     queryFn: async () => {
       const [{ data: isAdmin }, { data: isModerator }] = await Promise.all([
-        supabase.rpc("has_role", { _user_id: userId, _role: 'admin' }),
-        supabase.rpc("has_role", { _user_id: userId, _role: 'moderator' })
+        supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "moderator" }),
       ]);
       return { isAdmin, isModerator };
-    }
+    },
   });
 
   if (isLoading) {
@@ -47,7 +52,9 @@ function AdminRouteComponent() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="size-8 animate-spin text-gold" />
-          <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Verifying Security Credentials...</p>
+          <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">
+            Verifying Security Credentials...
+          </p>
         </div>
       </div>
     );
@@ -81,7 +88,8 @@ function AdminRouteComponent() {
             Admin <span className="text-gold">Command Center</span>
           </h1>
           <p className="text-sm font-medium text-ink-muted">
-            Manage rewards marketplace, member submissions, system tasks, and cryptographic audit logs.
+            Manage rewards marketplace, member submissions, system tasks, and cryptographic audit
+            logs.
           </p>
         </div>
 

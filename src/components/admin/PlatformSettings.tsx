@@ -1,12 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -33,27 +27,21 @@ function PermissionManager() {
   const { data: permissions, isLoading } = useQuery({
     queryKey: ["all-role-permissions"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_permissions")
-        .select("*")
-        .order("role");
+      const { data, error } = await supabase.from("role_permissions").select("*").order("role");
       if (error) throw error;
       return data;
-    }
+    },
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, is_enabled }: { id: string, is_enabled: boolean }) => {
-      const { error } = await supabase
-        .from("role_permissions")
-        .update({ is_enabled })
-        .eq("id", id);
+    mutationFn: async ({ id, is_enabled }: { id: string; is_enabled: boolean }) => {
+      const { error } = await supabase.from("role_permissions").update({ is_enabled }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-role-permissions"] });
       toast.success("Role permission updated");
-    }
+    },
   });
 
   if (isLoading) {
@@ -64,60 +52,83 @@ function PermissionManager() {
     );
   }
 
-  const roles = ['moderator', 'tasker'];
-  const tabs = ['analytics', 'users', 'fraud', 'tasks', 'verifications', 'rewards', 'redemptions', 'referrals', 'audit', 'settings'];
+  const roles = ["moderator", "tasker"];
+  const tabs = [
+    "analytics",
+    "users",
+    "fraud",
+    "tasks",
+    "verifications",
+    "rewards",
+    "redemptions",
+    "referrals",
+    "audit",
+    "settings",
+  ];
 
   return (
     <div className="space-y-6">
-      {roles.map(role => (
+      {roles.map((role) => (
         <div key={role} className="space-y-3 bg-ink/60 rounded-2xl p-4 border border-hairline">
           <div className="flex items-center justify-between border-b border-hairline pb-2.5">
             <div className="flex items-center gap-2">
-              <span className={cn(
-                "font-black uppercase tracking-wider text-[11px] px-2.5 py-0.5 rounded-lg border font-mono",
-                role === 'moderator' ? "bg-blue-500/15 text-blue-400 border-blue-500/30" : "bg-indigo-500/15 text-indigo-400 border-indigo-500/30"
-              )}>
+              <span
+                className={cn(
+                  "font-black uppercase tracking-wider text-[11px] px-2.5 py-0.5 rounded-lg border font-mono",
+                  role === "moderator"
+                    ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
+                    : "bg-indigo-500/15 text-indigo-400 border-indigo-500/30",
+                )}
+              >
                 {role} role
               </span>
               <span className="text-[11px] text-ink-muted font-medium">Accessible tabs</span>
             </div>
             <span className="text-[10px] text-ink-muted font-mono">
-              {permissions?.filter(p => p.role === role && p.is_enabled).length || 0} active
+              {permissions?.filter((p) => p.role === role && p.is_enabled).length || 0} active
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
-            {tabs.map(tab => {
-              const perm = permissions?.find(p => p.role === role && p.tab_name === tab);
+            {tabs.map((tab) => {
+              const perm = permissions?.find((p) => p.role === role && p.tab_name === tab);
               const isEnabled = perm?.is_enabled ?? false;
 
               return (
-                <div 
-                  key={tab} 
+                <div
+                  key={tab}
                   className={cn(
                     "flex items-center justify-between p-2.5 rounded-xl border transition-colors",
-                    isEnabled 
-                      ? "bg-ink-2/80 border-gold/25" 
-                      : "bg-ink-3/40 border-hairline opacity-75"
+                    isEnabled
+                      ? "bg-ink-2/80 border-gold/25"
+                      : "bg-ink-3/40 border-hairline opacity-75",
                   )}
                 >
-                  <span className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider",
-                    isEnabled ? "text-ink-fg" : "text-ink-muted"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider",
+                      isEnabled ? "text-ink-fg" : "text-ink-muted",
+                    )}
+                  >
                     {tab}
                   </span>
-                  <Switch 
+                  <Switch
                     checked={isEnabled}
                     onCheckedChange={(checked) => {
                       if (perm) {
                         toggleMutation.mutate({ id: perm.id, is_enabled: checked });
                       } else {
-                        supabase.from("role_permissions").insert({ 
-                          role: role as "admin" | "moderator" | "task_manager" | "tasker" | "user", 
-                          tab_name: tab, 
-                          is_enabled: checked 
-                        }).then(() => queryClient.invalidateQueries({ queryKey: ["all-role-permissions"] }));
+                        supabase
+                          .from("role_permissions")
+                          .insert({
+                            role: role as
+                              "admin" | "moderator" | "task_manager" | "tasker" | "user",
+                            tab_name: tab,
+                            is_enabled: checked,
+                          })
+                          .then(() =>
+                            queryClient.invalidateQueries({ queryKey: ["all-role-permissions"] }),
+                          );
                       }
                     }}
                     className="data-[state=checked]:bg-gold scale-90"
@@ -140,17 +151,16 @@ export function PlatformSettings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ["appSettings"],
     queryFn: async () => {
-      const { data, error } = await (supabase.from("app_settings" as any) as any)
-        .select("*");
+      const { data, error } = await (supabase.from("app_settings" as any) as any).select("*");
       if (error) throw error;
       return data as AppSetting[];
-    }
+    },
   });
 
   useEffect(() => {
     if (settings) {
       const vals: Record<string, any> = {};
-      settings.forEach(s => {
+      settings.forEach((s) => {
         vals[s.key] = s.value;
       });
       setLocalValues(vals);
@@ -158,7 +168,7 @@ export function PlatformSettings() {
   }, [settings]);
 
   const updateMutation = useMutation({
-    mutationFn: async ({ key, value }: { key: string, value: any }) => {
+    mutationFn: async ({ key, value }: { key: string; value: any }) => {
       const { error } = await (supabase.from("app_settings" as any) as any)
         .update({ value, updated_at: new Date().toISOString() })
         .eq("key", key);
@@ -170,7 +180,7 @@ export function PlatformSettings() {
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to update setting");
-    }
+    },
   });
 
   const handleSave = (key: string) => {
@@ -191,7 +201,9 @@ export function PlatformSettings() {
         <div className="flex items-center gap-3">
           <AlertCircle className="size-6 text-rose-400 shrink-0" />
           <div>
-            <h4 className="font-black text-sm uppercase tracking-wider text-rose-200">Access Restricted</h4>
+            <h4 className="font-black text-sm uppercase tracking-wider text-rose-200">
+              Access Restricted
+            </h4>
             <p className="text-xs text-rose-300/80 font-medium mt-0.5">
               Only platform administrators can modify system parameters and role access.
             </p>
@@ -213,23 +225,32 @@ export function PlatformSettings() {
             </div>
             <div>
               <h3 className="text-base font-black text-ink-fg">Platform Configuration</h3>
-              <p className="text-xs text-ink-muted font-medium">Configure global limits and operation rules</p>
+              <p className="text-xs text-ink-muted font-medium">
+                Configure global limits and operation rules
+              </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1.5 bg-ink p-4 rounded-2xl border border-hairline">
-              <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Daily Task Completion Limit</Label>
+              <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">
+                Daily Task Completion Limit
+              </Label>
               <div className="flex gap-2 pt-1">
-                <Input 
+                <Input
                   type="number"
-                  value={localValues['daily_task_limit'] ?? 10}
-                  onChange={(e) => setLocalValues(prev => ({ ...prev, daily_task_limit: parseInt(e.target.value) || 0 }))}
-                  className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold" 
+                  value={localValues["daily_task_limit"] ?? 10}
+                  onChange={(e) =>
+                    setLocalValues((prev) => ({
+                      ...prev,
+                      daily_task_limit: parseInt(e.target.value) || 0,
+                    }))
+                  }
+                  className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold"
                 />
-                <Button 
+                <Button
                   className="rounded-xl h-11 px-4 bg-gold text-ink hover:bg-gold-soft font-black text-xs cursor-pointer shadow-md shadow-gold/10 shrink-0"
-                  onClick={() => handleSave('daily_task_limit')}
+                  onClick={() => handleSave("daily_task_limit")}
                   disabled={updateMutation.isPending}
                 >
                   <Save className="size-4 mr-1.5" />
@@ -251,21 +272,27 @@ export function PlatformSettings() {
             </div>
             <div>
               <h3 className="text-base font-black text-ink-fg">Welcome Bonus & Referral Rewards</h3>
-              <p className="text-xs text-ink-muted font-medium">Configure signup and onboarding point rewards</p>
+              <p className="text-xs text-ink-muted font-medium">
+                Configure signup and onboarding point rewards
+              </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 rounded-2xl bg-ink border border-hairline">
               <div className="space-y-0.5">
-                <Label className="text-xs font-bold uppercase tracking-wider text-ink-fg">Enable Welcome Bonus Popup</Label>
-                <p className="text-[11px] text-ink-muted font-medium">Display welcome bonus modal to newly registered users</p>
+                <Label className="text-xs font-bold uppercase tracking-wider text-ink-fg">
+                  Enable Welcome Bonus Popup
+                </Label>
+                <p className="text-[11px] text-ink-muted font-medium">
+                  Display welcome bonus modal to newly registered users
+                </p>
               </div>
-              <Switch 
-                checked={localValues['welcome_bonus_enabled'] === true}
+              <Switch
+                checked={localValues["welcome_bonus_enabled"] === true}
                 onCheckedChange={(checked) => {
-                  setLocalValues(prev => ({ ...prev, welcome_bonus_enabled: checked }));
-                  updateMutation.mutate({ key: 'welcome_bonus_enabled', value: checked });
+                  setLocalValues((prev) => ({ ...prev, welcome_bonus_enabled: checked }));
+                  updateMutation.mutate({ key: "welcome_bonus_enabled", value: checked });
                 }}
                 className="data-[state=checked]:bg-gold"
               />
@@ -273,17 +300,24 @@ export function PlatformSettings() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5 bg-ink p-4 rounded-2xl border border-hairline">
-                <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Referee Bonus (Points)</Label>
+                <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">
+                  Referee Bonus (Points)
+                </Label>
                 <div className="flex gap-2 pt-1">
-                  <Input 
+                  <Input
                     type="number"
-                    value={localValues['welcome_bonus_amount_referee'] || 0}
-                    onChange={(e) => setLocalValues(prev => ({ ...prev, welcome_bonus_amount_referee: parseInt(e.target.value) || 0 }))}
-                    className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold" 
+                    value={localValues["welcome_bonus_amount_referee"] || 0}
+                    onChange={(e) =>
+                      setLocalValues((prev) => ({
+                        ...prev,
+                        welcome_bonus_amount_referee: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                    className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold"
                   />
-                  <Button 
+                  <Button
                     className="rounded-xl h-11 px-3 bg-gold text-ink hover:bg-gold-soft font-black text-xs cursor-pointer shadow-md shadow-gold/10 shrink-0"
-                    onClick={() => handleSave('welcome_bonus_amount_referee')}
+                    onClick={() => handleSave("welcome_bonus_amount_referee")}
                     disabled={updateMutation.isPending}
                   >
                     <Save className="size-4" />
@@ -292,17 +326,24 @@ export function PlatformSettings() {
               </div>
 
               <div className="space-y-1.5 bg-ink p-4 rounded-2xl border border-hairline">
-                <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">Referrer Bonus (Points)</Label>
+                <Label className="text-[11px] font-bold uppercase tracking-wider text-ink-muted">
+                  Referrer Bonus (Points)
+                </Label>
                 <div className="flex gap-2 pt-1">
-                  <Input 
+                  <Input
                     type="number"
-                    value={localValues['welcome_bonus_amount_referrer'] || 0}
-                    onChange={(e) => setLocalValues(prev => ({ ...prev, welcome_bonus_amount_referrer: parseInt(e.target.value) || 0 }))}
-                    className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold" 
+                    value={localValues["welcome_bonus_amount_referrer"] || 0}
+                    onChange={(e) =>
+                      setLocalValues((prev) => ({
+                        ...prev,
+                        welcome_bonus_amount_referrer: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                    className="rounded-xl h-11 bg-ink-2 border-hairline text-ink-fg font-mono font-bold"
                   />
-                  <Button 
+                  <Button
                     className="rounded-xl h-11 px-3 bg-gold text-ink hover:bg-gold-soft font-black text-xs cursor-pointer shadow-md shadow-gold/10 shrink-0"
-                    onClick={() => handleSave('welcome_bonus_amount_referrer')}
+                    onClick={() => handleSave("welcome_bonus_amount_referrer")}
                     disabled={updateMutation.isPending}
                   >
                     <Save className="size-4" />
@@ -312,27 +353,48 @@ export function PlatformSettings() {
             </div>
 
             <div className="space-y-3 p-4 rounded-2xl bg-ink border border-hairline">
-              <Label className="text-xs font-bold uppercase tracking-wider text-ink-fg block">Required Social Profiles for Bonus</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-ink-fg block">
+                Required Social Profiles for Bonus
+              </Label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {['twitter', 'telegram', 'instagram', 'facebook'].map(social => (
-                  <div key={social} className="flex items-center gap-2 bg-ink-2/80 p-2.5 rounded-xl border border-hairline">
-                    <Switch 
+                {["twitter", "telegram", "instagram", "facebook"].map((social) => (
+                  <div
+                    key={social}
+                    className="flex items-center gap-2 bg-ink-2/80 p-2.5 rounded-xl border border-hairline"
+                  >
+                    <Switch
                       id={`social-${social}`}
-                      checked={Array.isArray(localValues['welcome_bonus_required_socials']) && localValues['welcome_bonus_required_socials'].includes(social)}
+                      checked={
+                        Array.isArray(localValues["welcome_bonus_required_socials"]) &&
+                        localValues["welcome_bonus_required_socials"].includes(social)
+                      }
                       onCheckedChange={(checked) => {
-                        const current = Array.isArray(localValues['welcome_bonus_required_socials']) ? [...localValues['welcome_bonus_required_socials']] : [];
+                        const current = Array.isArray(localValues["welcome_bonus_required_socials"])
+                          ? [...localValues["welcome_bonus_required_socials"]]
+                          : [];
                         let next;
                         if (checked) {
                           next = [...new Set([...current, social])];
                         } else {
-                          next = current.filter(s => s !== social);
+                          next = current.filter((s) => s !== social);
                         }
-                        setLocalValues(prev => ({ ...prev, welcome_bonus_required_socials: next }));
-                        updateMutation.mutate({ key: 'welcome_bonus_required_socials', value: next });
+                        setLocalValues((prev) => ({
+                          ...prev,
+                          welcome_bonus_required_socials: next,
+                        }));
+                        updateMutation.mutate({
+                          key: "welcome_bonus_required_socials",
+                          value: next,
+                        });
                       }}
                       className="data-[state=checked]:bg-gold scale-90"
                     />
-                    <Label htmlFor={`social-${social}`} className="text-xs font-bold capitalize cursor-pointer text-ink-fg">{social}</Label>
+                    <Label
+                      htmlFor={`social-${social}`}
+                      className="text-xs font-bold capitalize cursor-pointer text-ink-fg"
+                    >
+                      {social}
+                    </Label>
                   </div>
                 ))}
               </div>
@@ -353,7 +415,9 @@ export function PlatformSettings() {
             </div>
             <div>
               <h3 className="text-base font-black text-ink-fg">Role & Staff Permissions</h3>
-              <p className="text-xs text-ink-muted font-medium">Control which admin consoles each internal role can access</p>
+              <p className="text-xs text-ink-muted font-medium">
+                Control which admin consoles each internal role can access
+              </p>
             </div>
           </div>
 

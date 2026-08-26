@@ -6,21 +6,21 @@ import { Link } from "@tanstack/react-router";
 export function AccessDenied() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="max-w-md w-full text-center space-y-8 bg-card p-10 rounded-3xl border border-border shadow-2xl shadow-destructive/5"
       >
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.1, 1],
-            rotate: [0, -5, 5, 0]
+            rotate: [0, -5, 5, 0],
           }}
-          transition={{ 
-            duration: 4, 
+          transition={{
+            duration: 4,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
           className="inline-flex p-6 rounded-full bg-destructive/10 text-destructive"
         >
@@ -28,7 +28,7 @@ export function AccessDenied() {
         </motion.div>
 
         <div className="space-y-4">
-          <motion.h2 
+          <motion.h2
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -36,13 +36,14 @@ export function AccessDenied() {
           >
             Access Denied
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="text-muted-foreground font-medium text-lg leading-relaxed"
           >
-            You don't have the required permissions to view this secure area. This attempt has been logged.
+            You don't have the required permissions to view this secure area. This attempt has been
+            logged.
           </motion.p>
         </div>
 
@@ -51,7 +52,7 @@ export function AccessDenied() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <Button 
+          <Button
             asChild
             size="lg"
             className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[12px] shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"

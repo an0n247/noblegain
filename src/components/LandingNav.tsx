@@ -41,7 +41,7 @@ export function LandingNav() {
           "mx-auto max-w-6xl rounded-2xl transition-all duration-300",
           scrolled
             ? "ink-header-shadow border border-hairline bg-ink/85 backdrop-blur-xl"
-            : "border border-hairline/60 bg-ink/60 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)] backdrop-blur-md"
+            : "border border-hairline/60 bg-ink/60 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)] backdrop-blur-md",
         )}
       >
         <div className="grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-3 sm:h-16 sm:px-5 lg:grid-cols-[auto_1fr_auto]">
@@ -94,18 +94,23 @@ export function LandingNav() {
       </div>
 
       {/* Mobile Menu Drawer */}
-      <div className={cn("fixed inset-0 z-50 lg:hidden", mobileOpen ? "pointer-events-auto" : "pointer-events-none")}>
+      <div
+        className={cn(
+          "fixed inset-0 z-50 lg:hidden",
+          mobileOpen ? "pointer-events-auto" : "pointer-events-none",
+        )}
+      >
         <div
           onClick={() => setMobileOpen(false)}
           className={cn(
             "absolute inset-0 bg-ink/80 backdrop-blur-sm transition-opacity duration-300",
-            mobileOpen ? "opacity-100" : "opacity-0"
+            mobileOpen ? "opacity-100" : "opacity-0",
           )}
         />
         <div
           className={cn(
             "absolute inset-x-3 top-3 rounded-2xl border border-hairline bg-ink-2 p-5 transition-all duration-300",
-            mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+            mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0",
           )}
         >
           <div className="flex items-center justify-between">

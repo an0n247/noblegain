@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -47,9 +54,7 @@ export function TaskSubmissions() {
   const { data: counts } = useQuery({
     queryKey: ["admin-submission-counts"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("task_submissions")
-        .select("status");
+      const { data, error } = await supabase.from("task_submissions").select("status");
       if (error) throw error;
       const tally: Record<FilterValue, number> = { pending: 0, verified: 0, rejected: 0, all: 0 };
       data?.forEach((row) => {
@@ -66,7 +71,8 @@ export function TaskSubmissions() {
     queryFn: async () => {
       let query = supabase
         .from("task_submissions")
-        .select(`
+        .select(
+          `
           id,
           status,
           admin_note,
@@ -74,7 +80,8 @@ export function TaskSubmissions() {
           verified_at,
           tasks (id, title, points, category),
           profiles (id, full_name, username)
-        `)
+        `,
+        )
         .order(filter === "pending" ? "created_at" : "verified_at", {
           ascending: filter === "pending",
           nullsFirst: false,
@@ -97,14 +104,10 @@ export function TaskSubmissions() {
   useEffect(() => {
     const channel = supabase
       .channel("admin-submissions-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "task_submissions" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
-          queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
-        }
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "task_submissions" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
+        queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
+      })
       .subscribe();
 
     return () => {
@@ -212,14 +215,17 @@ export function TaskSubmissions() {
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl">
+            <DropdownMenuContent
+              align="start"
+              className="w-[var(--radix-dropdown-menu-trigger-width)] rounded-xl"
+            >
               {FILTERS.map((f) => (
                 <DropdownMenuItem
                   key={f.value}
                   onClick={() => setFilter(f.value)}
                   className={cn(
                     "flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-[11px] font-black uppercase tracking-widest cursor-pointer",
-                    filter === f.value && "bg-primary/10 text-primary"
+                    filter === f.value && "bg-primary/10 text-primary",
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -245,7 +251,7 @@ export function TaskSubmissions() {
                     "flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border",
                     filter === f.value
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 border-transparent"
-                      : "bg-card/50 text-muted-foreground border-border/40 hover:bg-primary/5 hover:text-primary"
+                      : "bg-card/50 text-muted-foreground border-border/40 hover:bg-primary/5 hover:text-primary",
                   )}
                 >
                   <f.icon className="h-4 w-4" />
@@ -253,7 +259,9 @@ export function TaskSubmissions() {
                   <span
                     className={cn(
                       "ml-1 rounded-md px-1.5 py-0.5 text-[9px]",
-                      filter === f.value ? "bg-primary-foreground/20" : "bg-primary/10 text-primary"
+                      filter === f.value
+                        ? "bg-primary-foreground/20"
+                        : "bg-primary/10 text-primary",
                     )}
                   >
                     {count}
@@ -274,10 +282,18 @@ export function TaskSubmissions() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-border/50">
-                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">User</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">Task</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">Status</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">Submitted</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">
+                  User
+                </TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6">
+                  Task
+                </TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">
+                  Status
+                </TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-center">
+                  Submitted
+                </TableHead>
                 <TableHead className="font-black uppercase text-[10px] tracking-widest px-6 text-right">
                   {filter === "pending" ? "Actions" : "Details"}
                 </TableHead>
@@ -286,20 +302,28 @@ export function TaskSubmissions() {
             <TableBody>
               {submissions?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground font-medium">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-12 text-muted-foreground font-medium"
+                  >
                     {emptyMessage}
                   </TableCell>
                 </TableRow>
               ) : (
                 submissions?.map((sub) => (
-                  <TableRow key={sub.id} className="border-border/40 hover:bg-accent/5 transition-colors">
+                  <TableRow
+                    key={sub.id}
+                    className="border-border/40 hover:bg-accent/5 transition-colors"
+                  >
                     <TableCell className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <User className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <div className="font-bold text-sm">{sub.profiles?.full_name || "Unknown User"}</div>
+                          <div className="font-bold text-sm">
+                            {sub.profiles?.full_name || "Unknown User"}
+                          </div>
                           <div className="text-[10px] text-muted-foreground uppercase font-black">
                             @{sub.profiles?.username || "unknown"}
                           </div>
@@ -310,15 +334,23 @@ export function TaskSubmissions() {
                       <div className="flex items-center gap-2">
                         <ListTodo className="h-4 w-4 text-muted-foreground shrink-0" />
                         <div>
-                          <div className="font-bold text-sm">{sub.tasks?.title || "Deleted Task"}</div>
+                          <div className="font-bold text-sm">
+                            {sub.tasks?.title || "Deleted Task"}
+                          </div>
                           <div className="flex items-center gap-2 mt-0.5">
                             {sub.tasks?.points != null && (
-                              <Badge variant="outline" className="text-[9px] font-black border-primary/20 text-primary px-1 h-4">
+                              <Badge
+                                variant="outline"
+                                className="text-[9px] font-black border-primary/20 text-primary px-1 h-4"
+                              >
                                 +{sub.tasks.points} PTS
                               </Badge>
                             )}
                             {sub.tasks?.category && (
-                              <Badge variant="secondary" className="text-[9px] font-black px-1 h-4 uppercase">
+                              <Badge
+                                variant="secondary"
+                                className="text-[9px] font-black px-1 h-4 uppercase"
+                              >
                                 {sub.tasks.category}
                               </Badge>
                             )}
@@ -326,7 +358,9 @@ export function TaskSubmissions() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-4 text-center">{statusBadge(sub.status)}</TableCell>
+                    <TableCell className="px-6 py-4 text-center">
+                      {statusBadge(sub.status)}
+                    </TableCell>
                     <TableCell className="px-6 py-4 text-center">
                       <div className="text-xs font-medium text-muted-foreground">
                         {sub.created_at ? format(new Date(sub.created_at), "MMM d, HH:mm") : "—"}

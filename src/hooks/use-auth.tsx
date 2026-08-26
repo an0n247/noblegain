@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
-export type UserRole = 'admin' | 'moderator' | 'tasker' | 'user';
+export type UserRole = "admin" | "moderator" | "tasker" | "user";
 
 export function useAuth() {
   const [session, setSession] = useState<any>(null);
@@ -14,7 +14,9 @@ export function useAuth() {
       setIsSessionLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setIsSessionLoading(false);
     });
@@ -25,30 +27,30 @@ export function useAuth() {
   const { data: role, isLoading: isRoleLoading } = useQuery({
     queryKey: ["userRole", session?.user?.id],
     queryFn: async () => {
-      if (!session?.user?.id) return 'user' as UserRole;
-      
+      if (!session?.user?.id) return "user" as UserRole;
+
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", session.user.id)
         .maybeSingle();
-      
+
       if (error) {
         console.error("Error fetching role:", error);
-        return 'user' as UserRole;
+        return "user" as UserRole;
       }
-      
-      return (data?.role as UserRole) || 'user';
+
+      return (data?.role as UserRole) || "user";
     },
     enabled: !!session?.user?.id,
   });
 
   return {
     user: session?.user ?? null,
-    role: role ?? 'user',
-    isAdmin: role === 'admin',
-    isModerator: role === 'moderator' || role === 'admin',
-    isTasker: role === 'tasker' || role === 'moderator' || role === 'admin',
+    role: role ?? "user",
+    isAdmin: role === "admin",
+    isModerator: role === "moderator" || role === "admin",
+    isTasker: role === "tasker" || role === "moderator" || role === "admin",
     isLoading: isSessionLoading || (!!session?.user?.id && isRoleLoading),
   };
 }

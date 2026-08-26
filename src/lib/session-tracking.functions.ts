@@ -18,16 +18,14 @@ export const getClientIp = createServerFn({ method: "GET" }).handler(async () =>
 export const recordClientSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z
-      .object({ fingerprint: z.string().min(1).max(128).nullish() })
-      .parse(data ?? {}),
+    z.object({ fingerprint: z.string().min(1).max(128).nullish() }).parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
     const ip = getClientIpFromRequest();
 
     const update: Record<string, string> = {};
-    if (ip) update['last_ip'] = ip;
-    if (data.fingerprint) update['fingerprint'] = data.fingerprint;
+    if (ip) update["last_ip"] = ip;
+    if (data.fingerprint) update["fingerprint"] = data.fingerprint;
 
     if (Object.keys(update).length === 0) return { recorded: false, ip: null };
 

@@ -5,15 +5,23 @@ import { Lock, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/terms")({
   head: () => {
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://noblegain.lovable.app';
+    const url =
+      typeof window !== "undefined" ? window.location.origin : "https://noblegain.lovable.app";
     const canonicalUrl = `${url}/terms`;
 
     return {
       title: "Terms of Service | Noble Gain",
       meta: [
-        { name: "description", content: "Read the Noble Gain terms of service. Understand our rules, user obligations, and platform policies before you start earning." },
+        {
+          name: "description",
+          content:
+            "Read the Noble Gain terms of service. Understand our rules, user obligations, and platform policies before you start earning.",
+        },
         { property: "og:title", content: "Terms of Service | Noble Gain" },
-        { property: "og:description", content: "The rules of the road for Noble Gain. Read our terms of service." },
+        {
+          property: "og:description",
+          content: "The rules of the road for Noble Gain. Read our terms of service.",
+        },
         { property: "og:url", content: canonicalUrl },
         { property: "og:type", content: "website" },
         { property: "og:image", content: `${url}/logo.png` },
@@ -42,9 +50,7 @@ function TermsPage() {
             <h1 className="text-balance text-4xl sm:text-5xl font-black tracking-[-0.04em] text-ink-fg">
               Terms of Service
             </h1>
-            <p className="mt-3 text-sm text-ink-muted">
-              Last updated: August 2026
-            </p>
+            <p className="mt-3 text-sm text-ink-muted">Last updated: August 2026</p>
           </div>
         </section>
 
@@ -56,7 +62,9 @@ function TermsPage() {
                   1. Agreement to Terms
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  By accessing or registering an account on Noble Gain ("the Platform"), you agree to abide by these Terms of Service. If you do not agree with any part of these terms, you must discontinue use of the platform immediately.
+                  By accessing or registering an account on Noble Gain ("the Platform"), you agree
+                  to abide by these Terms of Service. If you do not agree with any part of these
+                  terms, you must discontinue use of the platform immediately.
                 </p>
               </section>
 
@@ -65,9 +73,19 @@ function TermsPage() {
                   2. User Eligibility & Account Security
                 </h2>
                 <ul className="list-disc pl-6 space-y-2 text-ink-muted">
-                  <li>You must provide accurate and verifiable email information upon registration.</li>
-                  <li>Each individual user is permitted to maintain only <strong className="text-ink-fg">one (1) account</strong>. Creating multiple accounts or using VPN/proxy circumvention to farm rewards is strictly prohibited.</li>
-                  <li>You are solely responsible for maintaining the confidentiality of your credentials and all activity conducted through your account.</li>
+                  <li>
+                    You must provide accurate and verifiable email information upon registration.
+                  </li>
+                  <li>
+                    Each individual user is permitted to maintain only{" "}
+                    <strong className="text-ink-fg">one (1) account</strong>. Creating multiple
+                    accounts or using VPN/proxy circumvention to farm rewards is strictly
+                    prohibited.
+                  </li>
+                  <li>
+                    You are solely responsible for maintaining the confidentiality of your
+                    credentials and all activity conducted through your account.
+                  </li>
                 </ul>
               </section>
 
@@ -76,7 +94,11 @@ function TermsPage() {
                   3. Task Submissions & Verification
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  Tasks submitted for point credits must comply with the stated instructions for each opportunity. The platform reserves the right to review, approve, reject, or request revisions for submissions that do not meet verification criteria. Submitting fake, altered, or duplicate proof will result in forfeiture of points and possible account termination.
+                  Tasks submitted for point credits must comply with the stated instructions for
+                  each opportunity. The platform reserves the right to review, approve, reject, or
+                  request revisions for submissions that do not meet verification criteria.
+                  Submitting fake, altered, or duplicate proof will result in forfeiture of points
+                  and possible account termination.
                 </p>
               </section>
 
@@ -85,9 +107,18 @@ function TermsPage() {
                   4. Points, Rewards & Redemptions
                 </h2>
                 <ul className="list-disc pl-6 space-y-2 text-ink-muted">
-                  <li>Points accrued within Noble Gain have no direct cash value outside the platform until successfully redeemed through available catalog rewards.</li>
-                  <li>Redemption requests undergo a security review before fulfillment to verify compliance with platform guidelines.</li>
-                  <li>Available rewards, redemption thresholds, and point exchange rates are subject to availability and updates by the platform administration.</li>
+                  <li>
+                    Points accrued within Noble Gain have no direct cash value outside the platform
+                    until successfully redeemed through available catalog rewards.
+                  </li>
+                  <li>
+                    Redemption requests undergo a security review before fulfillment to verify
+                    compliance with platform guidelines.
+                  </li>
+                  <li>
+                    Available rewards, redemption thresholds, and point exchange rates are subject
+                    to availability and updates by the platform administration.
+                  </li>
                 </ul>
               </section>
 
@@ -96,7 +127,9 @@ function TermsPage() {
                   5. Termination & Policy Violations
                 </h2>
                 <p className="text-ink-muted leading-relaxed">
-                  Noble Gain reserves the right to suspend or permanently ban accounts found engaging in automated botting, fraudulent task submissions, referral abuse, or harassment within the community.
+                  Noble Gain reserves the right to suspend or permanently ban accounts found
+                  engaging in automated botting, fraudulent task submissions, referral abuse, or
+                  harassment within the community.
                 </p>
               </section>
 

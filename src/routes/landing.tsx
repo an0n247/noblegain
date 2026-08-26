@@ -1,27 +1,26 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/landing')({
+export const Route = createFileRoute("/landing")({
   head: () => ({
     meta: [
-      { title: 'Noble Gain – Earn Rewards for Everyday Tasks' },
+      { title: "Noble Gain – Earn Rewards for Everyday Tasks" },
       {
-        name: 'description',
+        name: "description",
         content:
-          'Noble Gain is a gamified rewards platform. Complete tasks, earn points, and redeem them for real rewards.',
+          "Noble Gain is a gamified rewards platform. Complete tasks, earn points, and redeem them for real rewards.",
       },
-      { property: 'og:type', content: 'website' },
-      { property: 'og:title', content: 'Noble Gain – Earn Rewards for Everyday Tasks' },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "Noble Gain – Earn Rewards for Everyday Tasks" },
       {
-        property: 'og:description',
-        content:
-          'Complete tasks, earn points, and redeem them for real rewards on Noble Gain.',
+        property: "og:description",
+        content: "Complete tasks, earn points, and redeem them for real rewards on Noble Gain.",
       },
-      { name: 'twitter:card', content: 'summary' },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/landing"!</div>
+  return <div>Hello "/landing"!</div>;
 }

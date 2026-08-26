@@ -5,11 +5,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Coins, Loader2, Mail, Lock, User, CheckCircle2, ArrowLeft, Eye, EyeOff, Share2, Clock, RefreshCw, Sparkles, Inbox } from "lucide-react";
+import {
+  Coins,
+  Loader2,
+  Mail,
+  Lock,
+  User,
+  CheckCircle2,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Share2,
+  Clock,
+  RefreshCw,
+  Sparkles,
+  Inbox,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getClientIp } from "@/lib/session-tracking.functions";
@@ -20,19 +42,30 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     title: "Secure Login & Registration | Noble Gain",
     meta: [
-      { name: "description", content: "Access your Noble Gain account or sign up to start earning rewards. Secure login for the most trusted points-earning community." },
+      {
+        name: "description",
+        content:
+          "Access your Noble Gain account or sign up to start earning rewards. Secure login for the most trusted points-earning community.",
+      },
       { property: "og:title", content: "Join Noble Gain | Secure Access" },
-      { property: "og:description", content: "Sign in to manage your rewards or create a new account and get a 50-point welcome bonus with a referral code!" },
+      {
+        property: "og:description",
+        content:
+          "Sign in to manage your rewards or create a new account and get a 50-point welcome bonus with a referral code!",
+      },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search) => z.object({
-    redirect: z.string().optional(),
-    mode: z.enum(["login", "signup"]).optional(),
-    ref: z.string().optional(),
-  }).parse(search),
+  validateSearch: (search) =>
+    z
+      .object({
+        redirect: z.string().optional(),
+        mode: z.enum(["login", "signup"]).optional(),
+        ref: z.string().optional(),
+      })
+      .parse(search),
   component: AuthPage,
 });
 
@@ -40,7 +73,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
   const [activeTab, setActiveTab] = useState<"login" | "signup">(
-    search.mode || (search.ref ? "signup" : "login")
+    search.mode || (search.ref ? "signup" : "login"),
   );
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -51,11 +84,16 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [referralCode, setReferralCode] = useState(search.ref || "");
-  const [referralStatus, setReferralStatus] = useState<{ loading: boolean; owner: string | null; error: boolean; message: string | null }>({ 
-    loading: false, 
-    owner: null, 
+  const [referralStatus, setReferralStatus] = useState<{
+    loading: boolean;
+    owner: string | null;
+    error: boolean;
+    message: string | null;
+  }>({
+    loading: false,
+    owner: null,
     error: false,
-    message: null
+    message: null,
   });
   const [showVerification, setShowVerification] = useState(false);
   const [showReset, setShowReset] = useState(false);
@@ -70,19 +108,25 @@ function AuthPage() {
   useEffect(() => {
     if (!showVerification) return;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         toast.success("Email verified successfully! Welcome to Noble Gain.");
-        (supabase.from('analytics_events' as any) as any).insert({ 
-          event_name: 'signup_complete', 
-          metadata: { email, username } 
-        }).then();
+        (supabase.from("analytics_events" as any) as any)
+          .insert({
+            event_name: "signup_complete",
+            metadata: { email, username },
+          })
+          .then();
         navigate({ to: (search.redirect as any) || "/dashboard" });
       }
     });
 
     const interval = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) {
         toast.success("Email verified successfully! Welcome to Noble Gain.");
         navigate({ to: (search.redirect as any) || "/dashboard" });
@@ -94,7 +138,6 @@ function AuthPage() {
       clearInterval(interval);
     };
   }, [showVerification, email, username, navigate, search.redirect]);
-
 
   useEffect(() => {
     if (search.mode) {
@@ -116,55 +159,57 @@ function AuthPage() {
       setReferralStatus({ loading: false, owner: null, error: false, message: null });
       return;
     }
-    
-    setReferralStatus(prev => ({ ...prev, loading: true, error: false, message: null }));
+
+    setReferralStatus((prev) => ({ ...prev, loading: true, error: false, message: null }));
     try {
-      const { data, error: rpcError } = await supabase.rpc('check_referral_code', { _code: code.trim() });
-      
+      const { data, error: rpcError } = await supabase.rpc("check_referral_code", {
+        _code: code.trim(),
+      });
+
       if (rpcError) throw rpcError;
-      
+
       const result = Array.isArray(data) ? data[0] : data;
-      
+
       if (result && result.is_valid) {
-        setReferralStatus({ 
-          loading: false, 
-          owner: result.username, 
-          error: false, 
-          message: result.message || `Referrer found: ${result.username}` 
+        setReferralStatus({
+          loading: false,
+          owner: result.username,
+          error: false,
+          message: result.message || `Referrer found: ${result.username}`,
         });
       } else {
-        setReferralStatus({ 
-          loading: false, 
-          owner: null, 
-          error: true, 
-          message: result?.message || "This referral code does not exist or is invalid." 
+        setReferralStatus({
+          loading: false,
+          owner: null,
+          error: true,
+          message: result?.message || "This referral code does not exist or is invalid.",
         });
       }
     } catch (err) {
       console.error("Referral validation error:", err);
-      setReferralStatus({ 
-        loading: false, 
-        owner: null, 
-        error: true, 
-        message: "Unable to validate referral code. Please try again." 
+      setReferralStatus({
+        loading: false,
+        owner: null,
+        error: true,
+        message: "Unable to validate referral code. Please try again.",
       });
     }
   };
 
   const handleReferralChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^a-zA-Z0-9_]/g, '');
+    const val = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
     setReferralCode(val);
-    
+
     // Manual debounce using a simple ref-like approach via window for stability in this env
-    const timeoutKey = '_auth_ref_timeout';
+    const timeoutKey = "_auth_ref_timeout";
     if ((window as any)[timeoutKey]) clearTimeout((window as any)[timeoutKey]);
     (window as any)[timeoutKey] = setTimeout(() => {
       validateReferral(val);
     }, 500);
   };
 
-  const validate = (type: 'login' | 'signup') => {
-    if (type === 'login') {
+  const validate = (type: "login" | "signup") => {
+    if (type === "login") {
       if (!identifier) {
         setError("Please enter your email or username.");
         return false;
@@ -188,7 +233,6 @@ function AuthPage() {
       }
     }
 
-    
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return false;
@@ -199,14 +243,14 @@ function AuthPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate('login')) return;
+    if (!validate("login")) return;
     setLoading(true);
     try {
       let loginEmail = identifier.trim();
-      
+
       if (!loginEmail.includes("@")) {
-        const { data, error: rpcError } = await supabase.rpc('lookup_login_email', {
-          _username: loginEmail
+        const { data, error: rpcError } = await supabase.rpc("lookup_login_email", {
+          _username: loginEmail,
         });
 
         if (rpcError || !data) {
@@ -217,17 +261,16 @@ function AuthPage() {
 
       // The session is stored in localStorage and persists across refreshes and
       // browser restarts until the user signs out manually.
-      localStorage.removeItem('noble-gain-session-transient');
-      sessionStorage.removeItem('noble-gain-session-active');
+      localStorage.removeItem("noble-gain-session-transient");
+      sessionStorage.removeItem("noble-gain-session-active");
 
-
-      const { error } = await supabase.auth.signInWithPassword({ 
-        email: loginEmail, 
+      const { error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
         password,
       });
 
       if (error) throw error;
-      
+
       navigate({ to: (search.redirect as any) || "/dashboard" });
     } catch (error: any) {
       setError(error.message);
@@ -238,7 +281,7 @@ function AuthPage() {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate('signup')) return;
+    if (!validate("signup")) return;
     setLoading(true);
     try {
       // Resolve the real client IP server-side; null when it can't be determined.
@@ -246,8 +289,8 @@ function AuthPage() {
         .then((r) => r.ip)
         .catch(() => null);
 
-      const options: any = { 
-        email, 
+      const options: any = {
+        email,
         password,
         options: {
           data: {
@@ -255,14 +298,14 @@ function AuthPage() {
             full_name: fullName,
             referral_code_used: referralCode || null,
             fingerprint: (window as any)._ep_fingerprint || null,
-            ip_address: signupIp
-          }
-        }
+            ip_address: signupIp,
+          },
+        },
       };
 
       const { error } = await supabase.auth.signUp(options);
       if (error) throw error;
-      
+
       setShowVerification(true);
       toast.success("Verification link sent to your email!");
     } catch (error: any) {
@@ -277,11 +320,11 @@ function AuthPage() {
     setError("");
     try {
       const { error } = await supabase.auth.resend({
-        type: 'signup',
+        type: "signup",
         email: email,
         options: {
           emailRedirectTo: window.location.origin + "/dashboard",
-        }
+        },
       });
       if (error) throw error;
       toast.success("A fresh verification link has been sent to your email!");
@@ -314,8 +357,8 @@ function AuthPage() {
       let targetEmail = input;
 
       if (!targetEmail.includes("@")) {
-        const { data } = await supabase.rpc('lookup_login_email', {
-          _username: targetEmail
+        const { data } = await supabase.rpc("lookup_login_email", {
+          _username: targetEmail,
         });
         targetEmail = (data as string | null) ?? "";
       }
@@ -336,11 +379,8 @@ function AuthPage() {
     }
   };
 
-
-
   const shellClass =
     "auth-shell relative min-h-screen w-full px-4 py-0 flex flex-col items-center justify-center bg-background text-foreground sm:px-6 overflow-hidden hero-gradient";
-
 
   const Brand = () => (
     <div className="flex items-center justify-center gap-2.5">
@@ -382,7 +422,7 @@ function AuthPage() {
                   <Mail className="size-6 sm:size-7 text-gold animate-pulse" />
                 </div>
               </div>
-              
+
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 border border-gold/20 text-[11px] font-bold text-gold mt-3">
                 <span className="size-1.5 rounded-full bg-gold animate-ping" />
                 <span>Waiting for email confirmation...</span>
@@ -395,7 +435,8 @@ function AuthPage() {
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 We have sent a secure verification link to{" "}
-                <span className="font-bold text-foreground break-all">{email}</span>. Click the link in the message to activate your account.
+                <span className="font-bold text-foreground break-all">{email}</span>. Click the link
+                in the message to activate your account.
               </p>
             </div>
 
@@ -406,13 +447,20 @@ function AuthPage() {
                 <span>Quick Verification Tips:</span>
               </div>
               <ul className="text-[11px] sm:text-xs text-muted-foreground space-y-1 pl-4 list-disc font-medium">
-                <li>Check your <strong className="text-foreground">Spam</strong>, <strong className="text-foreground">Junk</strong>, or <strong className="text-foreground">Promotions</strong> folder if not in your primary inbox.</li>
+                <li>
+                  Check your <strong className="text-foreground">Spam</strong>,{" "}
+                  <strong className="text-foreground">Junk</strong>, or{" "}
+                  <strong className="text-foreground">Promotions</strong> folder if not in your
+                  primary inbox.
+                </li>
                 <li>This window will automatically proceed to your dashboard once confirmed.</li>
               </ul>
             </div>
 
             {error && (
-              <div className="rounded-2xl bg-destructive/10 p-2.5 text-xs sm:text-sm font-bold text-destructive">{error}</div>
+              <div className="rounded-2xl bg-destructive/10 p-2.5 text-xs sm:text-sm font-bold text-destructive">
+                {error}
+              </div>
             )}
 
             <div className="space-y-2 pt-1">
@@ -449,18 +497,24 @@ function AuthPage() {
   }
 
   const fieldLabel = "text-xs sm:text-sm font-bold text-foreground";
-  const fieldInput = "auth-input h-10 sm:h-11 rounded-2xl border-border/70 bg-background px-3.5 sm:px-4 text-sm sm:text-base glass-card";
+  const fieldInput =
+    "auth-input h-10 sm:h-11 rounded-2xl border-border/70 bg-background px-3.5 sm:px-4 text-sm sm:text-base glass-card";
 
   return (
     <div className={cn(shellClass, "px-4 sm:px-6")}>
-      <div className="floating-blob w-96 h-96 bg-primary/20 top-0 left-0" style={{ animationDelay: '0s' }} />
-      <div className="floating-blob w-80 h-80 bg-secondary/20 top-1/3 right-0" style={{ animationDelay: '-5s' }} />
+      <div
+        className="floating-blob w-96 h-96 bg-primary/20 top-0 left-0"
+        style={{ animationDelay: "0s" }}
+      />
+      <div
+        className="floating-blob w-80 h-80 bg-secondary/20 top-1/3 right-0"
+        style={{ animationDelay: "-5s" }}
+      />
       <div className="w-full max-w-[94%] sm:max-w-md">
         <div className="flex justify-start">
           <BackLink />
         </div>
         <div className="glass-card rounded-[2rem] p-4 sm:p-6 sm:py-5 premium-shadow-lg">
-
           <Brand />
 
           <h2 className="mt-2 text-center text-lg sm:text-xl font-black tracking-tight text-foreground uppercase">
@@ -481,7 +535,11 @@ function AuthPage() {
                 onClick={handleGoogleLogin}
                 className="mt-3.5 sm:mt-4 h-10 sm:h-11 w-full rounded-2xl border-border/70 bg-background text-xs sm:text-sm font-bold glass-card hover:bg-primary/5 transition-colors"
               >
-                <img src="https://www.google.com/favicon.ico" className="mr-2.5 h-3.5 w-3.5" alt="" />
+                <img
+                  src="https://www.google.com/favicon.ico"
+                  className="mr-2.5 h-3.5 w-3.5"
+                  alt=""
+                />
                 Continue with Google
               </Button>
 
@@ -490,20 +548,26 @@ function AuthPage() {
                   <span className="w-full border-t border-border/70" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-card px-2.5 text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold">or email</span>
+                  <span className="bg-card px-2.5 text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-bold">
+                    or email
+                  </span>
                 </div>
               </div>
             </>
           )}
 
           {error && (
-            <div className="mb-3 rounded-2xl bg-destructive/10 p-2.5 text-sm font-bold text-destructive">{error}</div>
+            <div className="mb-3 rounded-2xl bg-destructive/10 p-2.5 text-sm font-bold text-destructive">
+              {error}
+            </div>
           )}
 
           {showReset ? (
             <form onSubmit={handlePasswordReset} className="space-y-3 sm:space-y-3.5">
               <div className="space-y-1 sm:space-y-1.5">
-                <Label htmlFor="reset-email" className={fieldLabel}>Email or username</Label>
+                <Label htmlFor="reset-email" className={fieldLabel}>
+                  Email or username
+                </Label>
                 <Input
                   id="reset-email"
                   type="text"
@@ -516,7 +580,11 @@ function AuthPage() {
                 />
               </div>
               <div className="pt-1">
-                <Button type="submit" className="h-10 sm:h-11 w-full rounded-2xl text-sm sm:text-base font-bold premium-shadow hover:scale-105 transition-transform" disabled={resetLoading}>
+                <Button
+                  type="submit"
+                  className="h-10 sm:h-11 w-full rounded-2xl text-sm sm:text-base font-bold premium-shadow hover:scale-105 transition-transform"
+                  disabled={resetLoading}
+                >
                   {resetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {resetSent ? "Resend link" : "Send reset link"}
                 </Button>
@@ -538,7 +606,9 @@ function AuthPage() {
                 <div className="space-y-3 sm:space-y-3.5">
                   <form onSubmit={handleEmailLogin} className="space-y-3 sm:space-y-3.5">
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="identifier" className={fieldLabel}>Email</Label>
+                      <Label htmlFor="identifier" className={fieldLabel}>
+                        Email
+                      </Label>
                       <Input
                         id="identifier"
                         className={fieldInput}
@@ -549,7 +619,9 @@ function AuthPage() {
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="password" className={fieldLabel}>Password</Label>
+                      <Label htmlFor="password" className={fieldLabel}>
+                        Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="password"
@@ -565,7 +637,11 @@ function AuthPage() {
                           className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary"
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -577,7 +653,10 @@ function AuthPage() {
                           checked={rememberMe}
                           onCheckedChange={(checked) => setRememberMe(checked === true)}
                         />
-                        <Label htmlFor="rememberMe" className="cursor-pointer text-xs sm:text-sm font-medium text-muted-foreground">
+                        <Label
+                          htmlFor="rememberMe"
+                          className="cursor-pointer text-xs sm:text-sm font-medium text-muted-foreground"
+                        >
                           Remember me
                         </Label>
                       </div>
@@ -595,7 +674,11 @@ function AuthPage() {
                     </div>
 
                     <div className="pt-1">
-                      <Button type="submit" className="h-10 sm:h-11 w-full rounded-2xl text-sm sm:text-base font-bold premium-shadow hover:scale-105 transition-transform" disabled={loading}>
+                      <Button
+                        type="submit"
+                        className="h-10 sm:h-11 w-full rounded-2xl text-sm sm:text-base font-bold premium-shadow hover:scale-105 transition-transform"
+                        disabled={loading}
+                      >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Sign in
                       </Button>
@@ -616,7 +699,9 @@ function AuthPage() {
                 <div className="space-y-3 sm:space-y-3.5">
                   <form onSubmit={handleEmailSignUp} className="space-y-3 sm:space-y-3.5">
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="full-name" className={fieldLabel}>Full name</Label>
+                      <Label htmlFor="full-name" className={fieldLabel}>
+                        Full name
+                      </Label>
                       <Input
                         id="full-name"
                         className={fieldInput}
@@ -626,17 +711,23 @@ function AuthPage() {
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="signup-username" className={fieldLabel}>Username</Label>
+                      <Label htmlFor="signup-username" className={fieldLabel}>
+                        Username
+                      </Label>
                       <Input
                         id="signup-username"
                         className={fieldInput}
                         value={username}
-                        onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                        onChange={(e) =>
+                          setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
+                        }
                         required
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="signup-email" className={fieldLabel}>Email</Label>
+                      <Label htmlFor="signup-email" className={fieldLabel}>
+                        Email
+                      </Label>
                       <Input
                         id="signup-email"
                         type="email"
@@ -647,7 +738,9 @@ function AuthPage() {
                       />
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="signup-password" className={fieldLabel}>Password</Label>
+                      <Label htmlFor="signup-password" className={fieldLabel}>
+                        Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="signup-password"
@@ -663,12 +756,18 @@ function AuthPage() {
                           className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary"
                           aria-label={showSignupPassword ? "Hide password" : "Show password"}
                         >
-                          {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showSignupPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
-                      <Label htmlFor="referral-code" className={fieldLabel}>Referral code (optional)</Label>
+                      <Label htmlFor="referral-code" className={fieldLabel}>
+                        Referral code (optional)
+                      </Label>
                       <div className="relative">
                         <Input
                           id="referral-code"
@@ -709,18 +808,27 @@ function AuthPage() {
                         onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
                         className="mt-0.5"
                       />
-                      <label htmlFor="terms" className="cursor-pointer text-xs font-medium text-muted-foreground">
+                      <label
+                        htmlFor="terms"
+                        className="cursor-pointer text-xs font-medium text-muted-foreground"
+                      >
                         I agree to the{" "}
-                        <Link to="/terms" className="font-bold text-primary underline underline-offset-2">
+                        <Link
+                          to="/terms"
+                          className="font-bold text-primary underline underline-offset-2"
+                        >
                           Terms of Service
                         </Link>{" "}
                         and{" "}
-                        <Link to="/privacy" className="font-bold text-primary underline underline-offset-2">
+                        <Link
+                          to="/privacy"
+                          className="font-bold text-primary underline underline-offset-2"
+                        >
                           Privacy Policy
                         </Link>
                       </label>
                     </div>
-                    
+
                     <div className="pt-1">
                       <Button
                         type="submit"
