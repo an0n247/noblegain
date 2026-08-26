@@ -49,6 +49,6 @@ export function useAuth() {
     isAdmin: role === 'admin',
     isModerator: role === 'moderator' || role === 'admin',
     isTasker: role === 'tasker' || role === 'moderator' || role === 'admin',
-    isLoading: isRoleLoading || !session && session !== null,
+    isLoading: isSessionLoading || (!!session?.user?.id && isRoleLoading),
   };
 }
