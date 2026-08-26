@@ -6,14 +6,17 @@ export type UserRole = 'admin' | 'moderator' | 'tasker' | 'user';
 
 export function useAuth() {
   const [session, setSession] = useState<any>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setIsSessionLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setIsSessionLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -46,6 +49,6 @@ export function useAuth() {
     isAdmin: role === 'admin',
     isModerator: role === 'moderator' || role === 'admin',
     isTasker: role === 'tasker' || role === 'moderator' || role === 'admin',
-    isLoading: isRoleLoading || !session && session !== null,
+    isLoading: isSessionLoading || (!!session?.user?.id && isRoleLoading),
   };
 }
