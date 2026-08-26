@@ -219,11 +219,11 @@ function RootComponent() {
       console.log("Auth state change in root:", event, session?.user?.id);
 
       if (session?.user) {
-        // Record login IP/fingerprint to profile
-        supabase.from('profiles').update({
-          last_ip: 'client_side',
-          fingerprint: (window as any)._ep_fingerprint
-        } as any).eq('id', session.user.id).then();
+        // Record login IP/fingerprint. The IP is resolved server-side from the
+        // request headers so it is a real address, never a client-supplied value.
+        recordClientSession({
+          data: { fingerprint: (window as any)._ep_fingerprint ?? null },
+        }).catch((err) => console.error("Failed to record session:", err));
       }
       
       if (event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' && event !== 'USER_UPDATED') return;
