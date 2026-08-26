@@ -688,6 +688,51 @@ export type Database = {
           },
         ]
       }
+      video_watch_sessions: {
+        Row: {
+          consumed: boolean
+          created_at: string
+          expires_at: string
+          id: string
+          min_watch_seconds: number
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          consumed?: boolean
+          created_at?: string
+          expires_at?: string
+          id?: string
+          min_watch_seconds?: number
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          consumed?: boolean
+          created_at?: string
+          expires_at?: string
+          id?: string
+          min_watch_seconds?: number
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_watch_sessions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "repeatable_task_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_watch_sessions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       daily_task_completions: {
@@ -826,22 +871,14 @@ export type Database = {
         }
         Returns: Json
       }
-      check_referral_code:
-        | {
-            Args: { _code: string }
-            Returns: {
-              is_valid: boolean
-              username: string
-            }[]
-          }
-        | {
-            Args: { _code: string; _user_id?: string }
-            Returns: {
-              is_valid: boolean
-              message: string
-              username: string
-            }[]
-          }
+      check_referral_code: {
+        Args: { _code: string; _user_id?: string }
+        Returns: {
+          is_valid: boolean
+          message: string
+          username: string
+        }[]
+      }
       claim_daily_reward: { Args: { _user_id: string }; Returns: Json }
       claim_welcome_bonus: { Args: { _user_id: string }; Returns: Json }
       get_daily_task_completions:
@@ -900,30 +937,6 @@ export type Database = {
               unique_users: number
             }[]
           }
-      get_user_email_by_username: {
-        Args: { _username: string }
-        Returns: string
-      }
-      handle_admin_points_adjustment:
-        | {
-            Args: {
-              p_action_type: string
-              p_admin_id: string
-              p_amount: number
-              p_reason: string
-              p_target_user_id: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_action_type: string
-              p_amount: number
-              p_reason: string
-              p_target_user_id: string
-            }
-            Returns: Json
-          }
       has_completed_social_profile: {
         Args: { _user_id: string }
         Returns: boolean
@@ -949,20 +962,33 @@ export type Database = {
         }
         Returns: Json
       }
-      record_video_watch:
-        | { Args: { _task_id: string; _user_id: string }; Returns: Json }
+      record_video_watch: {
+        Args: { _session_id: string; _task_id: string; _user_id: string }
+        Returns: Json
+      }
+      redeem_reward: { Args: { _reward_id: string }; Returns: Json }
+      send_user_notification:
         | {
-            Args: { _session_id: string; _task_id: string; _user_id: string }
+            Args: {
+              _message: string
+              _title: string
+              _type: string
+              _user_id: string
+            }
             Returns: Json
           }
-      redeem_reward: { Args: { _reward_id: string }; Returns: Json }
-      send_user_notification: {
-        Args: {
-          _message: string
-          _title: string
-          _type: string
-          _user_id: string
-        }
+        | {
+            Args: {
+              _message: string
+              _metadata?: Json
+              _title: string
+              _type?: string
+              _user_id: string
+            }
+            Returns: Json
+          }
+      start_video_watch_session: {
+        Args: { _task_id: string; _user_id: string }
         Returns: Json
       }
       submit_task: {
