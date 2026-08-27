@@ -21,10 +21,20 @@ import {
   Inbox,
   History,
   ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type FilterValue = "pending" | "verified" | "rejected" | "all";
@@ -41,6 +51,33 @@ export function TaskSubmissions() {
   const [filter, setFilter] = useState<FilterValue>("pending");
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [noteTarget, setNoteTarget] = useState<{
+    submissionId: string;
+    userId?: string;
+    userName: string;
+    taskTitle: string;
+  } | null>(null);
+  const [noteMessage, setNoteMessage] = useState("");
+
+  const sendNoteMutation = useMutation({
+    mutationFn: async ({ userId, message, taskTitle }: { userId: string; message: string; taskTitle: string }) => {
+      const { data, error } = await (supabase.rpc as any)("send_user_notification", {
+        _user_id: userId,
+        _title: `Note about "${taskTitle}"`,
+        _message: message,
+        _type: "info",
+        _metadata: {},
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Note sent to the user");
+      setNoteTarget(null);
+      setNoteMessage("");
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to send note"),
+  });
 
   const { data: counts } = useQuery({
     queryKey: ["admin-submission-counts"],
@@ -361,14 +398,34 @@ export function TaskSubmissions() {
                           />
                         </div>
                       ) : (
-                        <div className="text-xs font-medium text-muted-foreground max-w-[220px] ml-auto text-right">
-                          {sub.admin_note ? (
-                            <span className="italic">"{sub.admin_note}"</span>
-                          ) : (
-                            <span className="text-muted-foreground/60">No note</span>
-                          )}
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="text-xs font-medium text-muted-foreground max-w-[220px] text-right">
+                            {sub.admin_note ? (
+                              <span className="italic">"{sub.admin_note}"</span>
+                            ) : (
+                              <span className="text-muted-foreground/60">No note</span>
+                            )}
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 rounded-lg font-bold text-xs"
+                            onClick={() =>
+                              setNoteTarget({
+                                submissionId: sub.id,
+                                userId: sub.profiles?.id,
+                                userName: sub.profiles?.full_name || sub.profiles?.username || "user",
+                                taskTitle: sub.tasks?.title || "Task",
+                              })
+                            }
+                            disabled={!sub.profiles?.id}
+                          >
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            Send Note
+                          </Button>
                         </div>
                       )}
+
                     </TableCell>
                   </TableRow>
                 ))
@@ -377,6 +434,54 @@ export function TaskSubmissions() {
           </Table>
         </div>
       )}
+
+      <Dialog
+        open={!!noteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNoteTarget(null);
+            setNoteMessage("");
+          }
+        }}
+      >
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-tight">Send Note</DialogTitle>
+            <DialogDescription>
+              Send a message to {noteTarget?.userName} about "{noteTarget?.taskTitle}". They will
+              receive it in their notifications.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Write your note to the user..."
+            value={noteMessage}
+            onChange={(e) => setNoteMessage(e.target.value)}
+            className="min-h-28 rounded-xl"
+          />
+          <DialogFooter>
+            <Button
+              className="rounded-xl font-bold"
+              disabled={!noteMessage.trim() || sendNoteMutation.isPending}
+              onClick={() =>
+                noteTarget?.userId &&
+                sendNoteMutation.mutate({
+                  userId: noteTarget.userId,
+                  message: noteMessage.trim(),
+                  taskTitle: noteTarget.taskTitle,
+                })
+              }
+            >
+              {sendNoteMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <MessageSquare className="h-4 w-4 mr-1" />
+              )}
+              Send Note
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
