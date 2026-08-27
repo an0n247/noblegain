@@ -162,10 +162,13 @@ export function AdminPanel() {
         ? "audit"
         : savedTab === "verifications"
           ? "approvals"
-          : savedTab || "users";
+          : savedTab === "referrals"
+            ? "analytics"
+            : savedTab || "users";
     }
     return "users";
   });
+
 
   useEffect(() => {
     localStorage.setItem("noblegain_admin_last_tab", activeTab);
