@@ -51,6 +51,33 @@ export function TaskSubmissions() {
   const [filter, setFilter] = useState<FilterValue>("pending");
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [noteTarget, setNoteTarget] = useState<{
+    submissionId: string;
+    userId?: string;
+    userName: string;
+    taskTitle: string;
+  } | null>(null);
+  const [noteMessage, setNoteMessage] = useState("");
+
+  const sendNoteMutation = useMutation({
+    mutationFn: async ({ userId, message, taskTitle }: { userId: string; message: string; taskTitle: string }) => {
+      const { data, error } = await (supabase.rpc as any)("send_user_notification", {
+        _user_id: userId,
+        _title: `Note about "${taskTitle}"`,
+        _message: message,
+        _type: "info",
+        _metadata: {},
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Note sent to the user");
+      setNoteTarget(null);
+      setNoteMessage("");
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to send note"),
+  });
 
   const { data: counts } = useQuery({
     queryKey: ["admin-submission-counts"],
