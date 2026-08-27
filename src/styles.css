@@ -53,14 +53,14 @@
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(255, 0, 0, 0.95) 45deg,
-    rgba(255, 127, 0, 0.95) 75deg,
-    rgba(255, 255, 0, 0.95) 105deg,
-    rgba(0, 255, 0, 0.95) 135deg,
-    rgba(0, 255, 255, 0.95) 165deg,
-    rgba(0, 0, 255, 0.95) 195deg,
-    rgba(139, 0, 255, 0.95) 225deg,
-    transparent 255deg,
+    rgba(255, 0, 0, 0.95) 50deg,
+    rgba(255, 127, 0, 0.95) 65deg,
+    rgba(255, 255, 0, 0.95) 80deg,
+    rgba(0, 255, 0, 0.95) 95deg,
+    rgba(0, 255, 255, 0.95) 110deg,
+    rgba(0, 0, 255, 0.95) 125deg,
+    rgba(139, 0, 255, 0.95) 140deg,
+    transparent 155deg,
     transparent 360deg
   );
   animation: rgb-rotate 3s linear infinite;
@@ -78,18 +78,18 @@
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(255, 0, 0, 0.55) 45deg,
-    rgba(255, 127, 0, 0.55) 75deg,
-    rgba(255, 255, 0, 0.55) 105deg,
-    rgba(0, 255, 0, 0.55) 135deg,
-    rgba(0, 255, 255, 0.55) 165deg,
-    rgba(0, 0, 255, 0.55) 195deg,
-    rgba(139, 0, 255, 0.55) 225deg,
-    transparent 255deg,
+    rgba(255, 0, 0, 0.55) 50deg,
+    rgba(255, 127, 0, 0.55) 65deg,
+    rgba(255, 255, 0, 0.55) 80deg,
+    rgba(0, 255, 0, 0.55) 95deg,
+    rgba(0, 255, 255, 0.55) 110deg,
+    rgba(0, 0, 255, 0.55) 125deg,
+    rgba(139, 0, 255, 0.55) 140deg,
+    transparent 155deg,
     transparent 360deg
   );
   animation: rgb-rotate 3s linear infinite;
-  filter: blur(14px);
+  filter: blur(12px);
   opacity: 0.35;
   pointer-events: none;
   z-index: -1;
