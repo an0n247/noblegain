@@ -17,7 +17,19 @@
   background: var(--muted-foreground);
 }
 
+:root {
+  --app-sidebar-w: 18rem;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
 /* RGB neon light that travels around the edge of a rounded container */
+
 @keyframes rgb-rotate {
   0% {
     transform: rotate(0deg);
