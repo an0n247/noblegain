@@ -38,45 +38,45 @@
 
 .rgb-neon-wrapper {
   position: relative;
-  padding: 2px;
+  padding: 1.5px;
   border-radius: 1rem;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(255, 0, 0, 0.95) 30deg,
-    rgba(255, 127, 0, 0.95) 60deg,
-    rgba(255, 255, 0, 0.95) 90deg,
-    rgba(0, 255, 0, 0.95) 120deg,
-    rgba(0, 255, 255, 0.95) 150deg,
-    rgba(0, 0, 255, 0.95) 180deg,
-    rgba(139, 0, 255, 0.95) 210deg,
-    transparent 240deg,
+    rgba(255, 0, 0, 0.95) 45deg,
+    rgba(255, 127, 0, 0.95) 75deg,
+    rgba(255, 255, 0, 0.95) 105deg,
+    rgba(0, 255, 0, 0.95) 135deg,
+    rgba(0, 255, 255, 0.95) 165deg,
+    rgba(0, 0, 255, 0.95) 195deg,
+    rgba(139, 0, 255, 0.95) 225deg,
+    transparent 255deg,
     transparent 360deg
   );
-  animation: rgb-rotate 2.5s linear infinite;
+  animation: rgb-rotate 3s linear infinite;
 }
 
 .rgb-neon-wrapper::before {
   content: "";
   position: absolute;
-  inset: -4px;
+  inset: -3px;
   border-radius: inherit;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
-    rgba(255, 0, 0, 0.6) 30deg,
-    rgba(255, 127, 0, 0.6) 60deg,
-    rgba(255, 255, 0, 0.6) 90deg,
-    rgba(0, 255, 0, 0.6) 120deg,
-    rgba(0, 255, 255, 0.6) 150deg,
-    rgba(0, 0, 255, 0.6) 180deg,
-    rgba(139, 0, 255, 0.6) 210deg,
-    transparent 240deg,
+    rgba(255, 0, 0, 0.55) 45deg,
+    rgba(255, 127, 0, 0.55) 75deg,
+    rgba(255, 255, 0, 0.55) 105deg,
+    rgba(0, 255, 0, 0.55) 135deg,
+    rgba(0, 255, 255, 0.55) 165deg,
+    rgba(0, 0, 255, 0.55) 195deg,
+    rgba(139, 0, 255, 0.55) 225deg,
+    transparent 255deg,
     transparent 360deg
   );
-  animation: rgb-rotate 2.5s linear infinite;
-  filter: blur(10px);
-  opacity: 0.55;
+  animation: rgb-rotate 3s linear infinite;
+  filter: blur(6px);
+  opacity: 0.35;
   pointer-events: none;
   z-index: -1;
 }
@@ -84,7 +84,7 @@
 .rgb-neon-inner {
   position: relative;
   z-index: 1;
-  border-radius: calc(1rem - 2px);
+  border-radius: calc(1rem - 1.5px);
 }
 
 @custom-variant dark (&:is(.dark *));
