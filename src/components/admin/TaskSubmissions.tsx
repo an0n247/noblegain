@@ -58,6 +58,13 @@ export function TaskSubmissions() {
     taskTitle: string;
   } | null>(null);
   const [noteMessage, setNoteMessage] = useState("");
+  const [removeTask, setRemoveTask] = useState(false);
+
+  const closeNoteDialog = () => {
+    setNoteTarget(null);
+    setNoteMessage("");
+    setRemoveTask(false);
+  };
 
   const sendNoteMutation = useMutation({
     mutationFn: async ({ userId, message, taskTitle }: { userId: string; message: string; taskTitle: string }) => {
@@ -73,11 +80,33 @@ export function TaskSubmissions() {
     },
     onSuccess: () => {
       toast.success("Note sent to the user");
-      setNoteTarget(null);
-      setNoteMessage("");
+      closeNoteDialog();
     },
     onError: (error: any) => toast.error(error.message || "Failed to send note"),
   });
+
+  const revokeMutation = useMutation({
+    mutationFn: async ({ submissionId, note }: { submissionId: string; note: string }) => {
+      const { data, error } = await (supabase.rpc as any)("admin_revoke_task_submission", {
+        _submission_id: submissionId,
+        _admin_note: note || null,
+      });
+      if (error) throw error;
+      if (data && (data as any).success === false)
+        throw new Error((data as any).message || "Failed to remove task");
+      return data as any;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Task removed and reset for the user${data?.points_removed ? ` (${data.points_removed} points reversed)` : ""}`,
+      );
+      closeNoteDialog();
+      queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to remove task"),
+  });
+
 
   const { data: counts } = useQuery({
     queryKey: ["admin-submission-counts"],
@@ -441,8 +470,10 @@ export function TaskSubmissions() {
           if (!open) {
             setNoteTarget(null);
             setNoteMessage("");
+            setRemoveTask(false);
           }
         }}
+
       >
         <DialogContent className="rounded-2xl">
           <DialogHeader>
@@ -458,27 +489,56 @@ export function TaskSubmissions() {
             onChange={(e) => setNoteMessage(e.target.value)}
             className="min-h-28 rounded-xl"
           />
+          <label className="flex items-start gap-3 rounded-xl border border-border p-3 cursor-pointer">
+            <Checkbox
+              checked={removeTask}
+              onCheckedChange={(checked) => setRemoveTask(checked === true)}
+              className="mt-0.5"
+            />
+            <span className="text-xs">
+              <span className="font-bold block">Remove the task</span>
+              <span className="text-muted-foreground">
+                Resets this task back to the user as a fresh task and removes the points credited
+                for it.
+              </span>
+            </span>
+          </label>
           <DialogFooter>
             <Button
               className="rounded-xl font-bold"
-              disabled={!noteMessage.trim() || sendNoteMutation.isPending}
-              onClick={() =>
-                noteTarget?.userId &&
-                sendNoteMutation.mutate({
-                  userId: noteTarget.userId,
-                  message: noteMessage.trim(),
-                  taskTitle: noteTarget.taskTitle,
-                })
+              variant={removeTask ? "destructive" : "default"}
+              disabled={
+                (!noteMessage.trim() && !removeTask) ||
+                sendNoteMutation.isPending ||
+                revokeMutation.isPending
               }
+              onClick={() => {
+                if (!noteTarget) return;
+                if (removeTask) {
+                  revokeMutation.mutate({
+                    submissionId: noteTarget.submissionId,
+                    note: noteMessage.trim(),
+                  });
+                } else if (noteTarget.userId) {
+                  sendNoteMutation.mutate({
+                    userId: noteTarget.userId,
+                    message: noteMessage.trim(),
+                    taskTitle: noteTarget.taskTitle,
+                  });
+                }
+              }}
             >
-              {sendNoteMutation.isPending ? (
+              {sendNoteMutation.isPending || revokeMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : removeTask ? (
+                <RotateCcw className="h-4 w-4 mr-1" />
               ) : (
                 <MessageSquare className="h-4 w-4 mr-1" />
               )}
-              Send Note
+              {removeTask ? "Remove Task & Notify" : "Send Note"}
             </Button>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
     </div>
