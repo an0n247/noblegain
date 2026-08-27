@@ -21,19 +21,11 @@ import {
   Inbox,
   History,
   ShieldCheck,
-  ChevronDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 type FilterValue = "pending" | "verified" | "rejected" | "all";
 
@@ -46,7 +38,6 @@ const FILTERS: { value: FilterValue; label: string; icon: typeof Clock }[] = [
 
 export function TaskSubmissions() {
   const queryClient = useQueryClient();
-  const isMobile = useIsMobile();
   const [filter, setFilter] = useState<FilterValue>("pending");
   const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -160,7 +151,6 @@ export function TaskSubmissions() {
     }
   }, [filter]);
 
-  const activeFilter = FILTERS.find((f) => f.value === filter) ?? FILTERS[0]!;
 
   const statusBadge = (status: string) => {
     if (status === "verified" || status === "approved") {
