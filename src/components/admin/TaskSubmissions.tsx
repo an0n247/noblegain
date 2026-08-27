@@ -58,6 +58,13 @@ export function TaskSubmissions() {
     taskTitle: string;
   } | null>(null);
   const [noteMessage, setNoteMessage] = useState("");
+  const [removeTask, setRemoveTask] = useState(false);
+
+  const closeNoteDialog = () => {
+    setNoteTarget(null);
+    setNoteMessage("");
+    setRemoveTask(false);
+  };
 
   const sendNoteMutation = useMutation({
     mutationFn: async ({ userId, message, taskTitle }: { userId: string; message: string; taskTitle: string }) => {
@@ -73,11 +80,33 @@ export function TaskSubmissions() {
     },
     onSuccess: () => {
       toast.success("Note sent to the user");
-      setNoteTarget(null);
-      setNoteMessage("");
+      closeNoteDialog();
     },
     onError: (error: any) => toast.error(error.message || "Failed to send note"),
   });
+
+  const revokeMutation = useMutation({
+    mutationFn: async ({ submissionId, note }: { submissionId: string; note: string }) => {
+      const { data, error } = await (supabase.rpc as any)("admin_revoke_task_submission", {
+        _submission_id: submissionId,
+        _admin_note: note || null,
+      });
+      if (error) throw error;
+      if (data && (data as any).success === false)
+        throw new Error((data as any).message || "Failed to remove task");
+      return data as any;
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Task removed and reset for the user${data?.points_removed ? ` (${data.points_removed} points reversed)` : ""}`,
+      );
+      closeNoteDialog();
+      queryClient.invalidateQueries({ queryKey: ["admin-task-submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-submission-counts"] });
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to remove task"),
+  });
+
 
   const { data: counts } = useQuery({
     queryKey: ["admin-submission-counts"],
