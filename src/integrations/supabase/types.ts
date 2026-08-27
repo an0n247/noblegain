@@ -984,26 +984,16 @@ export type Database = {
         Returns: Json
       }
       redeem_reward: { Args: { _reward_id: string }; Returns: Json }
-      send_user_notification:
-        | {
-            Args: {
-              _message: string
-              _title: string
-              _type: string
-              _user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _message: string
-              _metadata?: Json
-              _title: string
-              _type?: string
-              _user_id: string
-            }
-            Returns: Json
-          }
+      send_user_notification: {
+        Args: {
+          _message: string
+          _metadata?: Json
+          _title: string
+          _type?: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       start_video_watch_session: {
         Args: { _task_id: string; _user_id: string }
         Returns: Json
