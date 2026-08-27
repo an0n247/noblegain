@@ -576,6 +576,7 @@ export function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        </div>
       </div>
 
       {/* Mobile Overlay Sidebar (Off-canvas Drawer) */}
