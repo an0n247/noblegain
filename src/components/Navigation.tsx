@@ -442,7 +442,8 @@ export function Navigation() {
         </AlertDialogContent>
       </AlertDialog>
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-3 left-3 right-3 z-50 flex items-center justify-between h-15 px-4 bg-ink/85 border border-hairline rounded-2xl ink-header-shadow backdrop-blur-xl">
+      <div className="md:hidden fixed top-3 left-3 right-3 z-50 rgb-neon-wrapper">
+        <div className="rgb-neon-inner flex items-center justify-between h-15 px-4 bg-ink border border-hairline ink-header-shadow">
         <div className="flex items-center gap-2">
           <Link
             to="/dashboard"
