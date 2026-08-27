@@ -28,24 +28,22 @@ export const assignUserRole = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    if (data.role === "user") {
-      // Remove specific roles to reset to 'user'
-      const { error } = await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+    // The application treats roles as mutually exclusive. Remove stale roles
+    // first so useAuth never receives multiple rows for one user.
+    const { error: deleteError } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId);
 
-      if (error) throw new Error(error.message);
-      return { success: true };
-    }
+    if (deleteError) throw new Error(deleteError.message);
+    if (data.role === "user") return { success: true };
 
-    // Upsert the role
-    const { error } = await supabaseAdmin.from("user_roles").upsert(
-      {
-        user_id: data.userId,
-        role: data.role,
-      },
-      { onConflict: "user_id,role" },
-    );
+    const { error: insertError } = await supabaseAdmin.from("user_roles").insert({
+      user_id: data.userId,
+      role: data.role,
+    });
 
-    if (error) throw new Error(error.message);
+    if (insertError) throw new Error(insertError.message);
 
     return { success: true };
   });

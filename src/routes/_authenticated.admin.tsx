@@ -39,11 +39,14 @@ function AdminRouteComponent() {
   const { data: roles, isLoading } = useQuery({
     queryKey: ["admin-role-check", userId],
     queryFn: async () => {
-      const [{ data: isAdmin }, { data: isModerator }] = await Promise.all([
+      const [{ data: isAdmin }, { data: isModerator }, { data: isTasker }, { data: isTaskManager }] =
+        await Promise.all([
         supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
         supabase.rpc("has_role", { _user_id: userId, _role: "moderator" }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "tasker" }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "task_manager" }),
       ]);
-      return { isAdmin, isModerator };
+      return { isAdmin, isModerator, isTasker, isTaskManager };
     },
   });
 
@@ -60,7 +63,8 @@ function AdminRouteComponent() {
     );
   }
 
-  const isAuthorized = roles?.isAdmin || roles?.isModerator;
+  const isAuthorized =
+    roles?.isAdmin || roles?.isModerator || roles?.isTasker || roles?.isTaskManager;
 
   if (!isAuthorized) {
     return (

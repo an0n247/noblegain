@@ -171,6 +171,12 @@ export function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
+    if (filteredTabs.length > 0 && !filteredTabs.some((tab) => tab.value === activeTab)) {
+      setActiveTab(filteredTabs[0].value);
+    }
+  }, [activeTab, filteredTabs]);
+
+  useEffect(() => {
     const channel = supabase
       .channel("admin-stats-realtime")
       .on(
@@ -352,9 +358,10 @@ export function AdminPanel() {
           {filteredTabs.map((tab) => {
             const isActive = activeTab === tab.value;
             return (
-              <button
+              <Button
                 key={tab.value}
                 type="button"
+                variant="ghost"
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0",
@@ -365,7 +372,7 @@ export function AdminPanel() {
               >
                 <tab.icon className={cn("size-3.5", isActive ? "text-ink" : "text-gold/80")} />
                 <span>{tab.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
