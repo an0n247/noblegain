@@ -40,6 +40,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
+import { adjustUserPoints } from "@/lib/admin-points.functions";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Select,
   SelectContent,
@@ -50,6 +52,7 @@ import {
 
 export function ReferralsManager() {
   const queryClient = useQueryClient();
+  const adjustPointsFn = useServerFn(adjustUserPoints);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [adjustAmount, setAdjustAmount] = useState<string>("0");
   const [adjustType, setAdjustType] = useState<"earn" | "redemption">("earn");
@@ -138,19 +141,15 @@ export function ReferralsManager() {
   const paginatedEvents = referralEvents;
 
   const adjustPointsMutation = useMutation({
-    mutationFn: async ({ userId, amount, type, description }: any) => {
-      // @ts-ignore - The RPC is newly created in the migration and types might not be updated yet
-      const { data, error } = await supabase.rpc("admin_adjust_points", {
-        _user_id: userId,
-        _amount: amount,
-        _type: type,
-        _description: description,
+    mutationFn: async ({ userId, amount, description }: any) => {
+      await adjustPointsFn({
+        data: {
+          userId,
+          amount: Math.abs(amount),
+          actionType: amount >= 0 ? "credit" : "debit",
+          reason: description,
+        },
       });
-
-      if (error) throw error;
-
-      const result = data as any;
-      if (result && result.success === false) throw new Error(result.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-referrals-users"] });

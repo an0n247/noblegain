@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
-export type UserRole = "admin" | "moderator" | "tasker" | "user";
+export type UserRole = "admin" | "moderator" | "tasker" | "task_manager" | "user";
 
 export function useAuth() {
   const [session, setSession] = useState<any>(null);
@@ -33,6 +33,7 @@ export function useAuth() {
         .from("user_roles")
         .select("role")
         .eq("user_id", session.user.id)
+        .limit(1)
         .maybeSingle();
 
       if (error) {
@@ -50,7 +51,8 @@ export function useAuth() {
     role: role ?? "user",
     isAdmin: role === "admin",
     isModerator: role === "moderator" || role === "admin",
-    isTasker: role === "tasker" || role === "moderator" || role === "admin",
+    isTasker:
+      role === "tasker" || role === "task_manager" || role === "moderator" || role === "admin",
     isLoading: isSessionLoading || (!!session?.user?.id && isRoleLoading),
   };
 }

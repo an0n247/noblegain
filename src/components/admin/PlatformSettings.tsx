@@ -52,19 +52,8 @@ function PermissionManager() {
     );
   }
 
-  const roles = ["moderator", "tasker"];
-  const tabs = [
-    "analytics",
-    "users",
-    "fraud",
-    "tasks",
-    "verifications",
-    "rewards",
-    "redemptions",
-    "referrals",
-    "audit",
-    "settings",
-  ];
+  const roles = ["moderator", "task_manager", "tasker"];
+  const tabs = ["tasks", "verifications"];
 
   return (
     <div className="space-y-6">

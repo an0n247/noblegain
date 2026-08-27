@@ -170,7 +170,7 @@ export function UsersManager() {
           .order("created_at", { ascending: false }),
         supabase
           .from("redemptions")
-          .select("*, rewards(title, points_cost)")
+          .select("*, rewards(title, cost_points)")
           .eq("user_id", selectedUser.id)
           .order("created_at", { ascending: false }),
         supabase
@@ -610,7 +610,7 @@ export function UsersManager() {
                       >
                         <div className="font-bold mb-1">{red.rewards?.title}</div>
                         <div className="flex justify-between items-center opacity-70">
-                          <span>{red.rewards?.points_cost} pts</span>
+                          <span>{red.rewards?.cost_points} pts</span>
                           <span className="capitalize">{red.status}</span>
                         </div>
                       </div>

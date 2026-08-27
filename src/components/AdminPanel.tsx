@@ -152,6 +152,7 @@ export function AdminPanel() {
         },
       };
     },
+    enabled: isAdmin,
   });
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -234,6 +235,13 @@ export function AdminPanel() {
         ? permissions.includes("approvals") || permissions.includes("verifications")
         : permissions.includes(tab.value);
   });
+
+  useEffect(() => {
+    if (filteredTabs.length > 0 && !filteredTabs.some((tab) => tab.value === activeTab)) {
+      const firstTab = filteredTabs[0];
+      if (firstTab) setActiveTab(firstTab.value);
+    }
+  }, [activeTab, filteredTabs]);
 
   const statCards = [
     {
@@ -352,9 +360,10 @@ export function AdminPanel() {
           {filteredTabs.map((tab) => {
             const isActive = activeTab === tab.value;
             return (
-              <button
+              <Button
                 key={tab.value}
                 type="button"
+                variant="ghost"
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0",
@@ -365,7 +374,7 @@ export function AdminPanel() {
               >
                 <tab.icon className={cn("size-3.5", isActive ? "text-ink" : "text-gold/80")} />
                 <span>{tab.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>

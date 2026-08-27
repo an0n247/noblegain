@@ -494,25 +494,31 @@ export type Database = {
       }
       task_submissions: {
         Row: {
+          admin_note: string | null
           created_at: string | null
           id: string
           status: string
           task_id: string
           user_id: string
+          verified_at: string | null
         }
         Insert: {
+          admin_note?: string | null
           created_at?: string | null
           id?: string
           status: string
           task_id: string
           user_id: string
+          verified_at?: string | null
         }
         Update: {
+          admin_note?: string | null
           created_at?: string | null
           id?: string
           status?: string
           task_id?: string
           user_id?: string
+          verified_at?: string | null
         }
         Relationships: [
           {
@@ -1007,6 +1013,14 @@ export type Database = {
         Returns: Json
       }
       sync_points_balance: { Args: { p_user_id: string }; Returns: undefined }
+      verify_task_submission: {
+        Args: {
+          _admin_note?: string
+          _approve: boolean
+          _submission_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "tasker" | "moderator" | "task_manager"
