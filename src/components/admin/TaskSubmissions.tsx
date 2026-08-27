@@ -21,10 +21,20 @@ import {
   Inbox,
   History,
   ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type FilterValue = "pending" | "verified" | "rejected" | "all";
