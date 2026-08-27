@@ -20,6 +20,15 @@
 /* RGB neon light that travels around the edge of a rounded container */
 @keyframes rgb-travel {
   0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+@keyframes rgb-rotate {
+  0% {
     transform: rotate(0deg);
   }
   100% {
@@ -27,17 +36,10 @@
   }
 }
 
-.rgb-neon-edge {
+.rgb-neon-wrapper {
   position: relative;
-  isolation: isolate;
-}
-
-.rgb-neon-edge::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
   padding: 2px;
+  border-radius: 1rem;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
@@ -51,44 +53,39 @@
     transparent 240deg,
     transparent 360deg
   );
-  animation: rgb-travel 2.5s linear infinite;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  animation: rgb-rotate 2.5s linear infinite;
+}
+
+.rgb-neon-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 0, 0, 0.6) 30deg,
+    rgba(255, 127, 0, 0.6) 60deg,
+    rgba(255, 255, 0, 0.6) 90deg,
+    rgba(0, 255, 0, 0.6) 120deg,
+    rgba(0, 255, 255, 0.6) 150deg,
+    rgba(0, 0, 255, 0.6) 180deg,
+    rgba(139, 0, 255, 0.6) 210deg,
+    transparent 240deg,
+    transparent 360deg
+  );
+  animation: rgb-rotate 2.5s linear infinite;
+  filter: blur(10px);
+  opacity: 0.55;
   pointer-events: none;
   z-index: -1;
 }
 
-.rgb-neon-edge::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  padding: 4px;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 0, 0, 0.7) 30deg,
-    rgba(255, 127, 0, 0.7) 60deg,
-    rgba(255, 255, 0, 0.7) 90deg,
-    rgba(0, 255, 0, 0.7) 120deg,
-    rgba(0, 255, 255, 0.7) 150deg,
-    rgba(0, 0, 255, 0.7) 180deg,
-    rgba(139, 0, 255, 0.7) 210deg,
-    transparent 240deg,
-    transparent 360deg
-  );
-  animation: rgb-travel 2.5s linear infinite;
-  filter: blur(10px);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: -2;
+.rgb-neon-inner {
+  position: relative;
+  z-index: 1;
+  border-radius: calc(1rem - 2px);
+  background: inherit;
 }
 
 @custom-variant dark (&:is(.dark *));
