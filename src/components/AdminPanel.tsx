@@ -9,7 +9,7 @@ import {
   ArrowDownRight,
   Clock,
   Loader2,
-  Users2,
+  
   ChevronDown,
   Sparkles,
   Shield,
@@ -24,10 +24,8 @@ import { UsersManager } from "./admin/UsersManager";
 import { TasksManager } from "./admin/TasksManager";
 import { TaskSubmissions } from "./admin/TaskSubmissions";
 import { AnalyticsView } from "./admin/AnalyticsView";
-import { ReferralsManager } from "./admin/ReferralsManager";
 import { PlatformSettings } from "./admin/PlatformSettings";
 import { FraudManager } from "./admin/FraudManager";
-import { AuditLogs } from "./admin/AuditLogs";
 import { PointsAuditLogs } from "./admin/PointsAuditLogs";
 import { cn } from "@/lib/utils";
 import { ListTodo, PieChart, TrendingDown, Settings, ClipboardList } from "lucide-react";
