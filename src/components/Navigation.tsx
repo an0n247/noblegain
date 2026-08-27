@@ -584,13 +584,37 @@ export function Navigation() {
         <SidebarContent />
       </MobileMenuOverlay>
 
-      {/* Desktop Sidebar (Persistent) */}
-      <aside className="hidden md:flex fixed top-0 left-0 z-40 w-72 h-screen bg-ink border-r border-hairline">
-        <SidebarContent />
+      {/* Desktop Sidebar (Persistent, collapsible) */}
+      <aside
+        className="hidden md:flex fixed top-3 bottom-3 left-3 z-40 transition-[width] duration-300 ease-out"
+        style={{ width: "calc(var(--app-sidebar-w) - 1.5rem)" }}
+      >
+        <div className="relative flex-1 rounded-3xl bg-ink border border-hairline ink-header-shadow overflow-hidden">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gold/10 to-transparent" />
+          <SidebarContent collapsed={isSidebarCollapsed} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsSidebarCollapsed((v) => !v)}
+          aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute -right-3 top-24 z-50 h-7 w-7 rounded-full bg-ink-2 border border-hairline text-ink-muted hover:text-gold hover:border-gold/40 shadow-lg flex items-center justify-center transition-all cursor-pointer"
+        >
+          <ChevronRight
+            className={cn(
+              "h-4 w-4 transition-transform duration-300",
+              !isSidebarCollapsed && "rotate-180",
+            )}
+          />
+        </button>
       </aside>
 
       {/* Desktop Top Bar */}
-      <header className="hidden md:flex fixed top-0 right-0 z-30 h-20 items-center justify-between pl-80 pr-8 left-0 bg-ink/85 border-b border-hairline backdrop-blur-xl">
+      <div
+        className="hidden md:block fixed top-3 right-3 z-30 rgb-neon-wrapper transition-[left] duration-300 ease-out"
+        style={{ left: "var(--app-sidebar-w)" }}
+      >
+        <header className="rgb-neon-inner flex h-[4.25rem] items-center justify-between px-6 bg-ink border border-hairline ink-header-shadow">
+
         <div className="flex flex-col">
           <h1 className="text-base font-black uppercase tracking-tight text-ink-fg">
             {location.pathname === "/dashboard" && "Dashboard Overview"}
