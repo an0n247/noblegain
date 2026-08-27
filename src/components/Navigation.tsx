@@ -335,21 +335,32 @@ export function Navigation() {
     },
   ];
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full py-6 px-4 bg-ink text-ink-fg">
-      <div className="flex items-center gap-3 px-2 mb-8">
-        <img src="/logo.png" alt="Noble Gain" className="h-8 w-8 object-contain shrink-0" />
-        <span className="font-black text-xl tracking-[-0.03em] text-ink-fg">
-          Noble<span className="text-gold">Gain</span>
-        </span>
+  const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
+    <div
+      className={cn(
+        "relative flex flex-col h-full py-6 bg-ink text-ink-fg transition-all duration-300",
+        collapsed ? "px-3 items-stretch" : "px-4",
+      )}
+    >
+      <div className={cn("flex items-center gap-3 mb-8", collapsed ? "px-0 justify-center" : "px-2")}>
+        <img src="/logo.png" alt="Noble Gain" className="h-9 w-9 object-contain shrink-0" />
+        {!collapsed && (
+          <span className="font-black text-xl tracking-[-0.03em] text-ink-fg whitespace-nowrap">
+            Noble<span className="text-gold">Gain</span>
+          </span>
+        )}
       </div>
 
-      <div className="flex-1 space-y-8">
+      <div className="flex-1 space-y-7 overflow-y-auto no-scrollbar">
         {menuGroups.map((group) => (
           <div key={group.label} className="space-y-2">
-            <h3 className="px-2 text-[10px] font-bold text-ink-muted uppercase tracking-[0.18em]">
-              {group.label}
-            </h3>
+            {collapsed ? (
+              <div className="mx-auto h-px w-6 bg-hairline" />
+            ) : (
+              <h3 className="px-2 text-[10px] font-bold text-ink-muted uppercase tracking-[0.18em]">
+                {group.label}
+              </h3>
+            )}
             <div className="space-y-1">
               {group.items.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -357,24 +368,27 @@ export function Navigation() {
                   <Link
                     key={item.name}
                     to={item.href}
+                    title={collapsed ? item.name : undefined}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group",
+                      "relative flex items-center rounded-2xl text-xs font-bold transition-all group",
+                      collapsed ? "justify-center h-11 w-full" : "gap-3 px-3 py-2.5",
                       isActive
-                        ? "bg-gold/15 text-gold border border-gold/30 shadow-sm"
-                        : "text-ink-muted hover:bg-ink-2 hover:text-ink-fg",
+                        ? "bg-gradient-to-r from-gold/20 to-gold/5 text-gold border border-gold/30 shadow-[0_6px_20px_-10px_rgba(230,193,122,0.9)]"
+                        : "text-ink-muted hover:bg-ink-2 hover:text-ink-fg border border-transparent",
                     )}
                   >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-gold" />
+                    )}
                     <item.icon
                       className={cn(
-                        "h-4.5 w-4.5 transition-colors",
-                        isActive
-                          ? "text-gold fill-gold/20"
-                          : "text-ink-muted group-hover:text-ink-fg",
+                        "h-4.5 w-4.5 transition-colors shrink-0",
+                        isActive ? "text-gold" : "text-ink-muted group-hover:text-ink-fg",
                       )}
                       strokeWidth={2}
                     />
-                    <span>{item.name}</span>
+                    {!collapsed && <span className="whitespace-nowrap">{item.name}</span>}
                   </Link>
                 );
               })}
@@ -384,14 +398,19 @@ export function Navigation() {
       </div>
 
       <div className="mt-auto pt-6 border-t border-hairline">
-        <div className="flex items-center gap-3 px-2 mb-4">
-          <Avatar className="h-10 w-10 border border-hairline shadow-sm">
+        <div
+          className={cn(
+            "flex items-center gap-3 mb-4",
+            collapsed ? "justify-center px-0" : "px-2",
+          )}
+        >
+          <Avatar className="h-10 w-10 border border-gold/25 ring-1 ring-gold/15 shadow-sm shrink-0">
             <AvatarImage src={profile?.avatar_url || ""} />
             <AvatarFallback className="bg-ink-2 text-gold font-bold">
               <User className="h-5 w-5" />
             </AvatarFallback>
           </Avatar>
-          {profile && (
+          {profile && !collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-ink-fg truncate">
                 {profile.username
@@ -406,15 +425,20 @@ export function Navigation() {
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start text-ink-muted hover:text-rose-400 hover:bg-rose-500/10 rounded-xl px-3 h-10 transition-colors text-xs font-bold cursor-pointer"
+          title={collapsed ? "Sign Out" : undefined}
+          className={cn(
+            "w-full text-ink-muted hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl h-10 transition-colors text-xs font-bold cursor-pointer",
+            collapsed ? "justify-center px-0" : "justify-start px-3",
+          )}
           onClick={() => setShowLogoutDialog(true)}
         >
-          <LogOut className="mr-2.5 h-4 w-4" strokeWidth={2} />
-          <span>Sign Out</span>
+          <LogOut className={cn("h-4 w-4", !collapsed && "mr-2.5")} strokeWidth={2} />
+          {!collapsed && <span>Sign Out</span>}
         </Button>
       </div>
     </div>
   );
+
 
   return (
     <>
