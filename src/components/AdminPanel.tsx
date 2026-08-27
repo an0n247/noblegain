@@ -171,12 +171,6 @@ export function AdminPanel() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (filteredTabs.length > 0 && !filteredTabs.some((tab) => tab.value === activeTab)) {
-      setActiveTab(filteredTabs[0].value);
-    }
-  }, [activeTab, filteredTabs]);
-
-  useEffect(() => {
     const channel = supabase
       .channel("admin-stats-realtime")
       .on(
@@ -240,6 +234,12 @@ export function AdminPanel() {
         ? permissions.includes("approvals") || permissions.includes("verifications")
         : permissions.includes(tab.value);
   });
+
+  useEffect(() => {
+    if (filteredTabs.length > 0 && !filteredTabs.some((tab) => tab.value === activeTab)) {
+      setActiveTab(filteredTabs[0].value);
+    }
+  }, [activeTab, filteredTabs]);
 
   const statCards = [
     {
