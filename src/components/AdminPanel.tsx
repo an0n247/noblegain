@@ -9,7 +9,7 @@ import {
   ArrowDownRight,
   Clock,
   Loader2,
-  Users2,
+  
   ChevronDown,
   Sparkles,
   Shield,
@@ -24,10 +24,8 @@ import { UsersManager } from "./admin/UsersManager";
 import { TasksManager } from "./admin/TasksManager";
 import { TaskSubmissions } from "./admin/TaskSubmissions";
 import { AnalyticsView } from "./admin/AnalyticsView";
-import { ReferralsManager } from "./admin/ReferralsManager";
 import { PlatformSettings } from "./admin/PlatformSettings";
 import { FraudManager } from "./admin/FraudManager";
-import { AuditLogs } from "./admin/AuditLogs";
 import { PointsAuditLogs } from "./admin/PointsAuditLogs";
 import { cn } from "@/lib/utils";
 import { ListTodo, PieChart, TrendingDown, Settings, ClipboardList } from "lucide-react";
@@ -162,10 +160,13 @@ export function AdminPanel() {
         ? "audit"
         : savedTab === "verifications"
           ? "approvals"
-          : savedTab || "users";
+          : savedTab === "referrals"
+            ? "analytics"
+            : savedTab || "users";
     }
     return "users";
   });
+
 
   useEffect(() => {
     localStorage.setItem("noblegain_admin_last_tab", activeTab);
@@ -221,7 +222,7 @@ export function AdminPanel() {
     { value: "approvals", icon: Clock, label: "Submissions" },
     { value: "rewards", icon: ShoppingBag, label: "Rewards" },
     { value: "redemptions", icon: Clock, label: "Redemptions" },
-    { value: "referrals", icon: Users2, label: "Referrals" },
+    
     { value: "audit", icon: ClipboardList, label: "Audit Logs" },
     { value: "settings", icon: isAdmin ? Settings : Lock, label: "Settings" },
   ];
@@ -387,14 +388,14 @@ export function AdminPanel() {
           {activeTab === "approvals" && <TaskSubmissions />}
           {activeTab === "rewards" && <RewardsManager />}
           {activeTab === "redemptions" && <RedemptionsManager />}
-          {activeTab === "referrals" && <ReferralsManager />}
+          
           {activeTab === "audit" && (
             <div className="space-y-8">
-              <FraudManager />
               <PointsAuditLogs />
-              <AuditLogs />
+              <FraudManager />
             </div>
           )}
+
           {activeTab === "settings" && <PlatformSettings />}
         </div>
       </motion.div>
