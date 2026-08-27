@@ -40,6 +40,16 @@
   position: relative;
   padding: 1.5px;
   border-radius: 1rem;
+  overflow: hidden;
+}
+
+.rgb-neon-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
@@ -54,13 +64,17 @@
     transparent 360deg
   );
   animation: rgb-rotate 3s linear infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.rgb-neon-wrapper::before {
+.rgb-neon-wrapper::after {
   content: "";
   position: absolute;
-  inset: -3px;
-  border-radius: inherit;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
   background: conic-gradient(
     from 0deg,
     transparent 0deg,
@@ -75,7 +89,7 @@
     transparent 360deg
   );
   animation: rgb-rotate 3s linear infinite;
-  filter: blur(6px);
+  filter: blur(14px);
   opacity: 0.35;
   pointer-events: none;
   z-index: -1;
@@ -85,6 +99,7 @@
   position: relative;
   z-index: 1;
   border-radius: calc(1rem - 1.5px);
+  background: inherit;
 }
 
 @custom-variant dark (&:is(.dark *));
