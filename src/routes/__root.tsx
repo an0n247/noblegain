@@ -302,9 +302,10 @@ function RootComponent() {
               "flex-1 transition-all duration-300 w-full flex flex-col",
               !isPublicPage &&
                 !isAuthPage &&
-                "md:ml-72 w-full md:w-[calc(100%-18rem)] pb-20 md:pb-0",
+                "md:ml-[var(--app-sidebar-w)] w-full md:w-[calc(100%-var(--app-sidebar-w))] pb-20 md:pb-0",
             )}
           >
+
             <div
               className={cn(
                 "flex-1 w-full",
