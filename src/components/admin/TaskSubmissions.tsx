@@ -458,27 +458,56 @@ export function TaskSubmissions() {
             onChange={(e) => setNoteMessage(e.target.value)}
             className="min-h-28 rounded-xl"
           />
+          <label className="flex items-start gap-3 rounded-xl border border-border p-3 cursor-pointer">
+            <Checkbox
+              checked={removeTask}
+              onCheckedChange={(checked) => setRemoveTask(checked === true)}
+              className="mt-0.5"
+            />
+            <span className="text-xs">
+              <span className="font-bold block">Remove the task</span>
+              <span className="text-muted-foreground">
+                Resets this task back to the user as a fresh task and removes the points credited
+                for it.
+              </span>
+            </span>
+          </label>
           <DialogFooter>
             <Button
               className="rounded-xl font-bold"
-              disabled={!noteMessage.trim() || sendNoteMutation.isPending}
-              onClick={() =>
-                noteTarget?.userId &&
-                sendNoteMutation.mutate({
-                  userId: noteTarget.userId,
-                  message: noteMessage.trim(),
-                  taskTitle: noteTarget.taskTitle,
-                })
+              variant={removeTask ? "destructive" : "default"}
+              disabled={
+                (!noteMessage.trim() && !removeTask) ||
+                sendNoteMutation.isPending ||
+                revokeMutation.isPending
               }
+              onClick={() => {
+                if (!noteTarget) return;
+                if (removeTask) {
+                  revokeMutation.mutate({
+                    submissionId: noteTarget.submissionId,
+                    note: noteMessage.trim(),
+                  });
+                } else if (noteTarget.userId) {
+                  sendNoteMutation.mutate({
+                    userId: noteTarget.userId,
+                    message: noteMessage.trim(),
+                    taskTitle: noteTarget.taskTitle,
+                  });
+                }
+              }}
             >
-              {sendNoteMutation.isPending ? (
+              {sendNoteMutation.isPending || revokeMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : removeTask ? (
+                <RotateCcw className="h-4 w-4 mr-1" />
               ) : (
                 <MessageSquare className="h-4 w-4 mr-1" />
               )}
-              Send Note
+              {removeTask ? "Remove Task & Notify" : "Send Note"}
             </Button>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
     </div>
