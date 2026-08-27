@@ -41,8 +41,8 @@ export function LandingNav() {
           className={cn(
             "rgb-neon-inner grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-3 transition-all duration-300 sm:h-16 sm:px-5 lg:grid-cols-[auto_1fr_auto]",
             scrolled
-              ? "ink-header-shadow border border-hairline bg-ink/85 backdrop-blur-xl"
-              : "border border-hairline/60 bg-ink/60 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)] backdrop-blur-md",
+              ? "ink-header-shadow border border-hairline bg-ink"
+              : "border border-hairline/60 bg-ink shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)]",
           )}
         >
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
