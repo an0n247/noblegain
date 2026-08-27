@@ -879,6 +879,10 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_revoke_task_submission: {
+        Args: { _admin_note?: string; _submission_id: string }
+        Returns: Json
+      }
       check_referral_code: {
         Args: { _code: string; _user_id?: string }
         Returns: {
