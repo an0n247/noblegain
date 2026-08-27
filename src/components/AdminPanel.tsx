@@ -237,7 +237,8 @@ export function AdminPanel() {
 
   useEffect(() => {
     if (filteredTabs.length > 0 && !filteredTabs.some((tab) => tab.value === activeTab)) {
-      setActiveTab(filteredTabs[0].value);
+      const firstTab = filteredTabs[0];
+      if (firstTab) setActiveTab(firstTab.value);
     }
   }, [activeTab, filteredTabs]);
 

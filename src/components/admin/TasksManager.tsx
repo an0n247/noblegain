@@ -40,6 +40,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 export function parseTaskKeywordData(iconName: string | null) {
   if (!iconName) return { hasKeyword: false, keyword: "", hint: "" };
@@ -66,6 +67,7 @@ export function parseTaskKeywordData(iconName: string | null) {
 
 export function TasksManager() {
   const queryClient = useQueryClient();
+  const { isAdmin } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
 
@@ -648,18 +650,20 @@ export function TasksManager() {
                         >
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/5 cursor-pointer"
-                          onClick={() => {
-                            if (confirm("Are you sure you want to delete this task?")) {
-                              deleteTaskMutation.mutate(task.id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/5 cursor-pointer"
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this task?")) {
+                                deleteTaskMutation.mutate(task.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
