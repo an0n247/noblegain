@@ -387,7 +387,7 @@ export function AdminPanel() {
           {activeTab === "approvals" && <TaskSubmissions />}
           {activeTab === "rewards" && <RewardsManager />}
           {activeTab === "redemptions" && <RedemptionsManager />}
-          {activeTab === "referrals" && <ReferralsManager />}
+          
           {activeTab === "audit" && (
             <div className="space-y-8">
               <PointsAuditLogs />
