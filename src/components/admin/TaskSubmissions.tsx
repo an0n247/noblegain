@@ -441,8 +441,10 @@ export function TaskSubmissions() {
           if (!open) {
             setNoteTarget(null);
             setNoteMessage("");
+            setRemoveTask(false);
           }
         }}
+
       >
         <DialogContent className="rounded-2xl">
           <DialogHeader>
