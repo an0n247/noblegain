@@ -221,7 +221,7 @@ export function AdminPanel() {
     { value: "approvals", icon: Clock, label: "Submissions" },
     { value: "rewards", icon: ShoppingBag, label: "Rewards" },
     { value: "redemptions", icon: Clock, label: "Redemptions" },
-    { value: "referrals", icon: Users2, label: "Referrals" },
+    
     { value: "audit", icon: ClipboardList, label: "Audit Logs" },
     { value: "settings", icon: isAdmin ? Settings : Lock, label: "Settings" },
   ];
