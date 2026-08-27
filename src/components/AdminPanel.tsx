@@ -152,6 +152,7 @@ export function AdminPanel() {
         },
       };
     },
+    enabled: isAdmin,
   });
 
   const [activeTab, setActiveTab] = useState(() => {
