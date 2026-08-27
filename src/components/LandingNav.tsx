@@ -36,7 +36,7 @@ export function LandingNav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-      <div className="mx-auto max-w-6xl rgb-neon-wrapper transition-all duration-300">
+      <div className="relative mx-auto max-w-6xl rgb-neon-wrapper transition-all duration-300">
         <div
           className={cn(
             "rgb-neon-inner grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-3 transition-all duration-300 sm:h-16 sm:px-5 lg:grid-cols-[auto_1fr_auto]",
