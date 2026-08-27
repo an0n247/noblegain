@@ -376,8 +376,9 @@ function EarnPage() {
           </p>
         </div>
 
-        {/* Daily Allowance Tracker Card */}
-        <div className="rounded-2xl border border-hairline bg-ink-2/70 p-4 min-w-[260px] shadow-sm backdrop-blur-md">
+        {/* Daily Allowance Tracker Card (desktop only) */}
+        <div className="hidden md:block rounded-2xl border border-hairline bg-ink-2/70 p-4 min-w-[260px] shadow-sm backdrop-blur-md">
+
           <div className="flex items-center justify-between gap-2 mb-2">
             <span className="text-xs font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1.5">
               <Flame className="size-4 text-amber-500 fill-amber-500" />
