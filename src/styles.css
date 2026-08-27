@@ -85,7 +85,6 @@
   position: relative;
   z-index: 1;
   border-radius: calc(1rem - 2px);
-  background: inherit;
 }
 
 @custom-variant dark (&:is(.dark *));
