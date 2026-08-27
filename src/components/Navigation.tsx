@@ -701,7 +701,9 @@ export function Navigation() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </header>
+        </header>
+      </div>
+
     </>
   );
 }
