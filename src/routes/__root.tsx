@@ -305,7 +305,6 @@ function RootComponent() {
                 "md:ml-[var(--app-sidebar-w)] w-full md:w-[calc(100%-var(--app-sidebar-w))] pb-20 md:pb-0",
             )}
           >
-
             <div
               className={cn(
                 "flex-1 w-full",
