@@ -434,6 +434,54 @@ export function TaskSubmissions() {
           </Table>
         </div>
       )}
+
+      <Dialog
+        open={!!noteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setNoteTarget(null);
+            setNoteMessage("");
+          }
+        }}
+      >
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-tight">Send Note</DialogTitle>
+            <DialogDescription>
+              Send a message to {noteTarget?.userName} about "{noteTarget?.taskTitle}". They will
+              receive it in their notifications.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Write your note to the user..."
+            value={noteMessage}
+            onChange={(e) => setNoteMessage(e.target.value)}
+            className="min-h-28 rounded-xl"
+          />
+          <DialogFooter>
+            <Button
+              className="rounded-xl font-bold"
+              disabled={!noteMessage.trim() || sendNoteMutation.isPending}
+              onClick={() =>
+                noteTarget?.userId &&
+                sendNoteMutation.mutate({
+                  userId: noteTarget.userId,
+                  message: noteMessage.trim(),
+                  taskTitle: noteTarget.taskTitle,
+                })
+              }
+            >
+              {sendNoteMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <MessageSquare className="h-4 w-4 mr-1" />
+              )}
+              Send Note
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 }
