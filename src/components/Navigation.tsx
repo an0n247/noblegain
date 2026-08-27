@@ -444,138 +444,138 @@ export function Navigation() {
       {/* Mobile Top Bar */}
       <div className="md:hidden fixed top-3 left-3 right-3 z-50 rgb-neon-wrapper">
         <div className="rgb-neon-inner flex items-center justify-between h-15 px-4 bg-ink border border-hairline ink-header-shadow">
-        <div className="flex items-center gap-2">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-2 font-black text-base tracking-[-0.03em] ml-1"
-          >
-            <img src="/logo.png" alt="Noble Gain" className="h-7 w-7 object-contain" />
-            <span className="leading-tight text-ink-fg">
-              Noble<span className="text-gold">Gain</span>
-            </span>
-          </Link>
-        </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <NotificationsPopover />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-9 w-9 rounded-full p-0 border border-gold/30 shadow-sm ring-1 ring-gold/20 transition-transform hover:scale-105"
-                aria-label="User menu"
-              >
-                <Avatar className="h-full w-full">
-                  <AvatarImage src={profile?.avatar_url || ""} />
-                  <AvatarFallback className="bg-ink-2 text-gold font-bold">
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-56 mt-2 rounded-2xl p-2 bg-ink-2 border border-hairline text-ink-fg shadow-xl"
-              align="end"
+          <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-2 font-black text-base tracking-[-0.03em] ml-1"
             >
-              <DropdownMenuLabel className="font-black px-3 py-2">
-                <div className="flex flex-col space-y-0.5">
-                  <p className="text-sm font-black text-ink-fg">
-                    {profile?.username
-                      ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
-                      : "Member"}
-                  </p>
-                  <p className="text-[10px] text-gold uppercase tracking-wider font-mono font-bold">
-                    {profile?.points_balance?.toLocaleString()} PTS
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-hairline my-1" />
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
-              >
-                <Link
-                  to="/profile"
-                  className="flex items-center w-full"
-                  onClick={() => setIsMobileMenuOpen(false)}
+              <img src="/logo.png" alt="Noble Gain" className="h-7 w-7 object-contain" />
+              <span className="leading-tight text-ink-fg">
+                Noble<span className="text-gold">Gain</span>
+              </span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <NotificationsPopover />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-9 w-9 rounded-full p-0 border border-gold/30 shadow-sm ring-1 ring-gold/20 transition-transform hover:scale-105"
+                  aria-label="User menu"
                 >
-                  <User className="mr-2.5 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              {isAdmin && (
+                  <Avatar className="h-full w-full">
+                    <AvatarImage src={profile?.avatar_url || ""} />
+                    <AvatarFallback className="bg-ink-2 text-gold font-bold">
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-56 mt-2 rounded-2xl p-2 bg-ink-2 border border-hairline text-ink-fg shadow-xl"
+                align="end"
+              >
+                <DropdownMenuLabel className="font-black px-3 py-2">
+                  <div className="flex flex-col space-y-0.5">
+                    <p className="text-sm font-black text-ink-fg">
+                      {profile?.username
+                        ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
+                        : "Member"}
+                    </p>
+                    <p className="text-[10px] text-gold uppercase tracking-wider font-mono font-bold">
+                      {profile?.points_balance?.toLocaleString()} PTS
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-hairline my-1" />
                 <DropdownMenuItem
                   asChild
                   className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
                 >
                   <Link
-                    to="/admin"
+                    to="/profile"
                     className="flex items-center w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Shield className="mr-2.5 h-4 w-4" />
-                    Admin Panel
+                    <User className="mr-2.5 h-4 w-4" />
+                    Profile
                   </Link>
                 </DropdownMenuItem>
-              )}
-              {isModerator && !isAdmin && (
+                {isAdmin && (
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                  >
+                    <Link
+                      to="/admin"
+                      className="flex items-center w-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Shield className="mr-2.5 h-4 w-4" />
+                      Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {isModerator && !isAdmin && (
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                  >
+                    <Link
+                      to="/moderator"
+                      className="flex items-center w-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Shield className="mr-2.5 h-4 w-4" />
+                      Moderator Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {isTasker && !isModerator && !isAdmin && (
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                  >
+                    <Link
+                      to="/tasker"
+                      className="flex items-center w-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Shield className="mr-2.5 h-4 w-4" />
+                      Tasker Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   asChild
                   className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
                 >
                   <Link
-                    to="/moderator"
+                    to="/transactions"
                     className="flex items-center w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Shield className="mr-2.5 h-4 w-4" />
-                    Moderator Panel
+                    <History className="mr-2.5 h-4 w-4" />
+                    Points History
                   </Link>
                 </DropdownMenuItem>
-              )}
-              {isTasker && !isModerator && !isAdmin && (
                 <DropdownMenuItem
                   asChild
-                  className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                  className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer px-3 py-2 font-bold text-xs text-rose-400 transition-colors"
                 >
-                  <Link
-                    to="/tasker"
+                  <button
+                    onClick={() => setShowLogoutDialog(true)}
                     className="flex items-center w-full"
-                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Shield className="mr-2.5 h-4 w-4" />
-                    Tasker Panel
-                  </Link>
+                    <LogOut className="mr-2.5 h-4 w-4" />
+                    Sign out
+                  </button>
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
-              >
-                <Link
-                  to="/transactions"
-                  className="flex items-center w-full"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <History className="mr-2.5 h-4 w-4" />
-                  Points History
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer px-3 py-2 font-bold text-xs text-rose-400 transition-colors"
-              >
-                <button
-                  onClick={() => setShowLogoutDialog(true)}
-                  className="flex items-center w-full"
-                >
-                  <LogOut className="mr-2.5 h-4 w-4" />
-                  Sign out
-                </button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
