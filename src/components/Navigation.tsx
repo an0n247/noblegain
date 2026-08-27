@@ -97,6 +97,21 @@ export function Navigation() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("noble-gain-sidebar-collapsed");
+    if (stored === "true") setIsSidebarCollapsed(true);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("noble-gain-sidebar-collapsed", String(isSidebarCollapsed));
+    document.documentElement.style.setProperty(
+      "--app-sidebar-w",
+      isSidebarCollapsed ? "6rem" : "18rem",
+    );
+  }, [isSidebarCollapsed]);
+
 
   const isAuthPage = location.pathname === "/auth";
   const isLandingPage = location.pathname === "/";
