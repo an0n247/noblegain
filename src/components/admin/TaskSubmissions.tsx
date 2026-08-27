@@ -22,11 +22,13 @@ import {
   History,
   ShieldCheck,
   MessageSquare,
+  RotateCcw,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
