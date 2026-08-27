@@ -607,12 +607,13 @@ function AuthPage() {
                   <form onSubmit={handleEmailLogin} className="space-y-3 sm:space-y-3.5">
                     <div className="space-y-1 sm:space-y-1.5">
                       <Label htmlFor="identifier" className={fieldLabel}>
-                        Email
+                        Email or username
                       </Label>
                       <Input
                         id="identifier"
                         className={fieldInput}
                         autoCapitalize="none"
+                        placeholder="Enter email or username"
                         value={identifier}
                         onChange={(e) => setIdentifier(e.target.value)}
                         required
