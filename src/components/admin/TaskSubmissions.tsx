@@ -361,14 +361,34 @@ export function TaskSubmissions() {
                           />
                         </div>
                       ) : (
-                        <div className="text-xs font-medium text-muted-foreground max-w-[220px] ml-auto text-right">
-                          {sub.admin_note ? (
-                            <span className="italic">"{sub.admin_note}"</span>
-                          ) : (
-                            <span className="text-muted-foreground/60">No note</span>
-                          )}
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="text-xs font-medium text-muted-foreground max-w-[220px] text-right">
+                            {sub.admin_note ? (
+                              <span className="italic">"{sub.admin_note}"</span>
+                            ) : (
+                              <span className="text-muted-foreground/60">No note</span>
+                            )}
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 rounded-lg font-bold text-xs"
+                            onClick={() =>
+                              setNoteTarget({
+                                submissionId: sub.id,
+                                userId: sub.profiles?.id,
+                                userName: sub.profiles?.full_name || sub.profiles?.username || "user",
+                                taskTitle: sub.tasks?.title || "Task",
+                              })
+                            }
+                            disabled={!sub.profiles?.id}
+                          >
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            Send Note
+                          </Button>
                         </div>
                       )}
+
                     </TableCell>
                   </TableRow>
                 ))
