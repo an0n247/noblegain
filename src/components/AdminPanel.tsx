@@ -390,11 +390,11 @@ export function AdminPanel() {
           {activeTab === "referrals" && <ReferralsManager />}
           {activeTab === "audit" && (
             <div className="space-y-8">
-              <FraudManager />
               <PointsAuditLogs />
-              <AuditLogs />
+              <FraudManager />
             </div>
           )}
+
           {activeTab === "settings" && <PlatformSettings />}
         </div>
       </motion.div>
