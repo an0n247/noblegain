@@ -97,6 +97,20 @@ export function Navigation() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("noble-gain-sidebar-collapsed");
+    if (stored === "true") setIsSidebarCollapsed(true);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("noble-gain-sidebar-collapsed", String(isSidebarCollapsed));
+    document.documentElement.style.setProperty(
+      "--app-sidebar-w",
+      isSidebarCollapsed ? "6rem" : "18rem",
+    );
+  }, [isSidebarCollapsed]);
 
   const isAuthPage = location.pathname === "/auth";
   const isLandingPage = location.pathname === "/";
@@ -335,21 +349,34 @@ export function Navigation() {
     },
   ];
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full py-6 px-4 bg-ink text-ink-fg">
-      <div className="flex items-center gap-3 px-2 mb-8">
-        <img src="/logo.png" alt="Noble Gain" className="h-8 w-8 object-contain shrink-0" />
-        <span className="font-black text-xl tracking-[-0.03em] text-ink-fg">
-          Noble<span className="text-gold">Gain</span>
-        </span>
+  const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
+    <div
+      className={cn(
+        "relative flex flex-col h-full py-6 bg-ink text-ink-fg transition-all duration-300",
+        collapsed ? "px-3 items-stretch" : "px-4",
+      )}
+    >
+      <div
+        className={cn("flex items-center gap-3 mb-8", collapsed ? "px-0 justify-center" : "px-2")}
+      >
+        <img src="/logo.png" alt="Noble Gain" className="h-9 w-9 object-contain shrink-0" />
+        {!collapsed && (
+          <span className="font-black text-xl tracking-[-0.03em] text-ink-fg whitespace-nowrap">
+            Noble<span className="text-gold">Gain</span>
+          </span>
+        )}
       </div>
 
-      <div className="flex-1 space-y-8">
+      <div className="flex-1 space-y-7 overflow-y-auto no-scrollbar">
         {menuGroups.map((group) => (
           <div key={group.label} className="space-y-2">
-            <h3 className="px-2 text-[10px] font-bold text-ink-muted uppercase tracking-[0.18em]">
-              {group.label}
-            </h3>
+            {collapsed ? (
+              <div className="mx-auto h-px w-6 bg-hairline" />
+            ) : (
+              <h3 className="px-2 text-[10px] font-bold text-ink-muted uppercase tracking-[0.18em]">
+                {group.label}
+              </h3>
+            )}
             <div className="space-y-1">
               {group.items.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -357,24 +384,27 @@ export function Navigation() {
                   <Link
                     key={item.name}
                     to={item.href}
+                    title={collapsed ? item.name : undefined}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all group",
+                      "relative flex items-center rounded-2xl text-xs font-bold transition-all group",
+                      collapsed ? "justify-center h-11 w-full" : "gap-3 px-3 py-2.5",
                       isActive
-                        ? "bg-gold/15 text-gold border border-gold/30 shadow-sm"
-                        : "text-ink-muted hover:bg-ink-2 hover:text-ink-fg",
+                        ? "bg-gradient-to-r from-gold/20 to-gold/5 text-gold border border-gold/30 shadow-[0_6px_20px_-10px_rgba(230,193,122,0.9)]"
+                        : "text-ink-muted hover:bg-ink-2 hover:text-ink-fg border border-transparent",
                     )}
                   >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-gold" />
+                    )}
                     <item.icon
                       className={cn(
-                        "h-4.5 w-4.5 transition-colors",
-                        isActive
-                          ? "text-gold fill-gold/20"
-                          : "text-ink-muted group-hover:text-ink-fg",
+                        "h-4.5 w-4.5 transition-colors shrink-0",
+                        isActive ? "text-gold" : "text-ink-muted group-hover:text-ink-fg",
                       )}
                       strokeWidth={2}
                     />
-                    <span>{item.name}</span>
+                    {!collapsed && <span className="whitespace-nowrap">{item.name}</span>}
                   </Link>
                 );
               })}
@@ -384,14 +414,16 @@ export function Navigation() {
       </div>
 
       <div className="mt-auto pt-6 border-t border-hairline">
-        <div className="flex items-center gap-3 px-2 mb-4">
-          <Avatar className="h-10 w-10 border border-hairline shadow-sm">
+        <div
+          className={cn("flex items-center gap-3 mb-4", collapsed ? "justify-center px-0" : "px-2")}
+        >
+          <Avatar className="h-10 w-10 border border-gold/25 ring-1 ring-gold/15 shadow-sm shrink-0">
             <AvatarImage src={profile?.avatar_url || ""} />
             <AvatarFallback className="bg-ink-2 text-gold font-bold">
               <User className="h-5 w-5" />
             </AvatarFallback>
           </Avatar>
-          {profile && (
+          {profile && !collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-ink-fg truncate">
                 {profile.username
@@ -406,11 +438,15 @@ export function Navigation() {
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start text-ink-muted hover:text-rose-400 hover:bg-rose-500/10 rounded-xl px-3 h-10 transition-colors text-xs font-bold cursor-pointer"
+          title={collapsed ? "Sign Out" : undefined}
+          className={cn(
+            "w-full text-ink-muted hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl h-10 transition-colors text-xs font-bold cursor-pointer",
+            collapsed ? "justify-center px-0" : "justify-start px-3",
+          )}
           onClick={() => setShowLogoutDialog(true)}
         >
-          <LogOut className="mr-2.5 h-4 w-4" strokeWidth={2} />
-          <span>Sign Out</span>
+          <LogOut className={cn("h-4 w-4", !collapsed && "mr-2.5")} strokeWidth={2} />
+          {!collapsed && <span>Sign Out</span>}
         </Button>
       </div>
     </div>
@@ -584,124 +620,148 @@ export function Navigation() {
         <SidebarContent />
       </MobileMenuOverlay>
 
-      {/* Desktop Sidebar (Persistent) */}
-      <aside className="hidden md:flex fixed top-0 left-0 z-40 w-72 h-screen bg-ink border-r border-hairline">
-        <SidebarContent />
+      {/* Desktop Sidebar (Persistent, collapsible) */}
+      <aside
+        className="hidden md:flex fixed top-3 bottom-3 left-3 z-40 transition-[width] duration-300 ease-out"
+        style={{ width: "calc(var(--app-sidebar-w) - 1.5rem)" }}
+      >
+        <div className="relative flex-1 rounded-3xl bg-ink border border-hairline ink-header-shadow overflow-hidden">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gold/10 to-transparent" />
+          <SidebarContent collapsed={isSidebarCollapsed} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsSidebarCollapsed((v) => !v)}
+          aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute -right-3 top-24 z-50 h-7 w-7 rounded-full bg-ink-2 border border-hairline text-ink-muted hover:text-gold hover:border-gold/40 shadow-lg flex items-center justify-center transition-all cursor-pointer"
+        >
+          <ChevronRight
+            className={cn(
+              "h-4 w-4 transition-transform duration-300",
+              !isSidebarCollapsed && "rotate-180",
+            )}
+          />
+        </button>
       </aside>
 
       {/* Desktop Top Bar */}
-      <header className="hidden md:flex fixed top-0 right-0 z-30 h-20 items-center justify-between pl-80 pr-8 left-0 bg-ink/85 border-b border-hairline backdrop-blur-xl">
-        <div className="flex flex-col">
-          <h1 className="text-base font-black uppercase tracking-tight text-ink-fg">
-            {location.pathname === "/dashboard" && "Dashboard Overview"}
-            {location.pathname === "/earn" && "Earn Opportunities"}
-            {location.pathname === "/refer" && "Referral Accelerator"}
-            {location.pathname === "/redeem" && "Rewards Catalog"}
-            {location.pathname === "/profile" && "Account Profile"}
-            {location.pathname === "/transactions" && "Points Ledger"}
-            {location.pathname === "/settings" && "Account Settings"}
-            {location.pathname === "/admin" && "Admin Control Panel"}
-          </h1>
-          <p className="text-[11px] text-ink-muted font-medium">
-            Welcome back,{" "}
-            <strong className="text-gold">
-              {profile?.username
-                ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
-                : "Member"}
-            </strong>
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3.5">
-          <div className="flex items-center gap-2.5 bg-ink-2/80 border border-hairline px-3.5 py-1.5 rounded-xl">
-            <Coins className="h-4 w-4 text-gold" strokeWidth={2.5} />
-            <span className="text-xs font-mono font-black text-ink-fg">
-              {profile?.points_balance?.toLocaleString() || 0}
-              <span className="text-[10px] text-gold ml-1 font-bold">PTS</span>
-            </span>
+      <div
+        className="hidden md:block fixed top-3 right-3 z-30 rgb-neon-wrapper transition-[left] duration-300 ease-out"
+        style={{ left: "var(--app-sidebar-w)" }}
+      >
+        <header className="rgb-neon-inner flex h-[4.25rem] items-center justify-between px-6 bg-ink border border-hairline ink-header-shadow">
+          <div className="flex flex-col">
+            <h1 className="text-base font-black uppercase tracking-tight text-ink-fg">
+              {location.pathname === "/dashboard" && "Dashboard Overview"}
+              {location.pathname === "/earn" && "Earn Opportunities"}
+              {location.pathname === "/refer" && "Referral Accelerator"}
+              {location.pathname === "/redeem" && "Rewards Catalog"}
+              {location.pathname === "/profile" && "Account Profile"}
+              {location.pathname === "/transactions" && "Points Ledger"}
+              {location.pathname === "/settings" && "Account Settings"}
+              {location.pathname === "/admin" && "Admin Control Panel"}
+            </h1>
+            <p className="text-[11px] text-ink-muted font-medium">
+              Welcome back,{" "}
+              <strong className="text-gold">
+                {profile?.username
+                  ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
+                  : "Member"}
+              </strong>
+            </p>
           </div>
-          <div className="h-6 w-[1px] bg-hairline mx-0.5" />
-          <ThemeToggle />
-          <NotificationsPopover />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-9 w-9 rounded-full p-0 border border-gold/30 shadow-sm ring-1 ring-gold/20 transition-transform hover:scale-105 active:scale-95"
-                aria-label="User profile menu"
-              >
-                <Avatar className="h-full w-full">
-                  <AvatarImage src={profile?.avatar_url || ""} />
-                  <AvatarFallback className="bg-ink-2 text-gold font-bold">
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-64 mt-2 rounded-2xl p-2 bg-ink-2 border border-hairline text-ink-fg shadow-xl"
-              align="end"
-            >
-              <DropdownMenuLabel className="font-black px-3 py-2.5">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-black text-ink-fg">
-                    {profile?.username
-                      ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
-                      : "Member"}
-                  </p>
-                  <div className="flex items-center gap-1.5 bg-ink border border-hairline w-fit px-2.5 py-1 rounded-lg">
-                    <Coins className="h-3 w-3 text-gold" />
-                    <p className="text-[11px] text-gold uppercase tracking-wider font-mono font-bold">
-                      {profile?.points_balance?.toLocaleString()} PTS
-                    </p>
-                  </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-hairline my-1" />
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
-              >
-                <Link to="/profile" className="flex items-center w-full">
-                  <User className="mr-2.5 h-4 w-4" strokeWidth={2} />
-                  My Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
-              >
-                <Link to="/settings" className="flex items-center w-full">
-                  <Settings className="mr-2.5 h-4 w-4" strokeWidth={2} />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
-              >
-                <Link to="/transactions" className="flex items-center w-full">
-                  <History className="mr-2.5 h-4 w-4" strokeWidth={2} />
-                  Points History
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-hairline my-1" />
-              <DropdownMenuItem
-                asChild
-                className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer px-3 py-2 font-bold text-xs text-rose-400 transition-colors"
-              >
-                <button
-                  onClick={() => setShowLogoutDialog(true)}
-                  className="flex items-center w-full"
+
+          <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-2.5 bg-ink-2/80 border border-hairline px-3.5 py-1.5 rounded-xl">
+              <Coins className="h-4 w-4 text-gold" strokeWidth={2.5} />
+              <span className="text-xs font-mono font-black text-ink-fg">
+                {profile?.points_balance?.toLocaleString() || 0}
+                <span className="text-[10px] text-gold ml-1 font-bold">PTS</span>
+              </span>
+            </div>
+            <div className="h-6 w-[1px] bg-hairline mx-0.5" />
+            <ThemeToggle />
+            <NotificationsPopover />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-9 w-9 rounded-full p-0 border border-gold/30 shadow-sm ring-1 ring-gold/20 transition-transform hover:scale-105 active:scale-95"
+                  aria-label="User profile menu"
                 >
-                  <LogOut className="mr-2.5 h-4 w-4" strokeWidth={2} />
-                  Sign out
-                </button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+                  <Avatar className="h-full w-full">
+                    <AvatarImage src={profile?.avatar_url || ""} />
+                    <AvatarFallback className="bg-ink-2 text-gold font-bold">
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-64 mt-2 rounded-2xl p-2 bg-ink-2 border border-hairline text-ink-fg shadow-xl"
+                align="end"
+              >
+                <DropdownMenuLabel className="font-black px-3 py-2.5">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-black text-ink-fg">
+                      {profile?.username
+                        ? profile.username.charAt(0).toUpperCase() + profile.username.slice(1)
+                        : "Member"}
+                    </p>
+                    <div className="flex items-center gap-1.5 bg-ink border border-hairline w-fit px-2.5 py-1 rounded-lg">
+                      <Coins className="h-3 w-3 text-gold" />
+                      <p className="text-[11px] text-gold uppercase tracking-wider font-mono font-bold">
+                        {profile?.points_balance?.toLocaleString()} PTS
+                      </p>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-hairline my-1" />
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                >
+                  <Link to="/profile" className="flex items-center w-full">
+                    <User className="mr-2.5 h-4 w-4" strokeWidth={2} />
+                    My Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                >
+                  <Link to="/settings" className="flex items-center w-full">
+                    <Settings className="mr-2.5 h-4 w-4" strokeWidth={2} />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-xl focus:bg-ink-3 focus:text-gold cursor-pointer px-3 py-2 font-bold text-xs transition-colors"
+                >
+                  <Link to="/transactions" className="flex items-center w-full">
+                    <History className="mr-2.5 h-4 w-4" strokeWidth={2} />
+                    Points History
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-hairline my-1" />
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer px-3 py-2 font-bold text-xs text-rose-400 transition-colors"
+                >
+                  <button
+                    onClick={() => setShowLogoutDialog(true)}
+                    className="flex items-center w-full"
+                  >
+                    <LogOut className="mr-2.5 h-4 w-4" strokeWidth={2} />
+                    Sign out
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+      </div>
     </>
   );
 }
