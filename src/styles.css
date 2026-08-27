@@ -39,8 +39,9 @@
   }
 }
 
+/* NOTE: no `position` here — wrappers may be `fixed`; add `relative`
+   alongside this class when the element is not otherwise positioned. */
 .rgb-neon-wrapper {
-  position: relative;
   padding: 1.5px;
   border-radius: 1rem;
   overflow: hidden;
