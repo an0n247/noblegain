@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import LandingPage from "./index";
 
 export const Route = createFileRoute("/landing")({
   head: () => ({
@@ -22,5 +23,5 @@ export const Route = createFileRoute("/landing")({
 });
 
 function RouteComponent() {
-  return <div>Hello "/landing"!</div>;
+  return <LandingPage />;
 }
