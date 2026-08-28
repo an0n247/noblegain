@@ -72,33 +72,6 @@
   z-index: 0;
 }
 
-.rgb-neon-wrapper::after {
-  content: "";
-  position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 220%;
-  height: 220%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 0, 0, 0.55) 50deg,
-    rgba(255, 127, 0, 0.55) 65deg,
-    rgba(255, 255, 0, 0.55) 80deg,
-    rgba(0, 255, 0, 0.55) 95deg,
-    rgba(0, 255, 255, 0.55) 110deg,
-    rgba(0, 0, 255, 0.55) 125deg,
-    rgba(139, 0, 255, 0.55) 140deg,
-    transparent 155deg,
-    transparent 360deg
-  );
-  animation: rgb-rotate 3s linear infinite;
-  filter: blur(12px);
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: -1;
-}
-
 .rgb-neon-inner {
   position: relative;
   z-index: 1;
