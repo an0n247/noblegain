@@ -240,13 +240,19 @@ function EarnPage() {
       matchesStatus = !isPending && !isVerifiedToday && !isCompletedNonRepeatable;
     }
 
-    const matchesCategory =
-      activeStatus !== "available" ||
-      activeCategory === "All" ||
-      t.category?.toLowerCase() === activeCategory.toLowerCase();
-
-    return matchesStatus && matchesCategory;
+    return matchesStatus;
   });
+
+  // Shuffle tasks per user so each user sees a random order
+  const shuffledTasks = useMemo(() => {
+    if (!filteredTasks) return filteredTasks;
+    const arr = [...filteredTasks];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [tasks, activeStatus]);
 
   // Calculate quick summary metrics
   const availableCount =
