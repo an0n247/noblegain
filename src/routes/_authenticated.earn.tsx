@@ -525,35 +525,6 @@ function EarnPage() {
             </button>
           </div>
 
-          {/* Category Chips (Only on Available status) */}
-          {activeStatus === "available" && (
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none items-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-muted hidden sm:inline mr-1 flex items-center gap-1">
-                <Filter className="size-3.5" /> Category:
-              </span>
-              {categories.map((cat) => {
-                const isActive = activeCategory === cat.name;
-                return (
-                  <button
-                    key={cat.name}
-                    type="button"
-                    onClick={() => setActiveCategory(cat.name)}
-                    className={cn(
-                      "rounded-xl font-bold h-9 px-3.5 text-xs shrink-0 transition-all flex items-center gap-1.5 border cursor-pointer",
-                      isActive
-                        ? "bg-gold/15 border-gold/40 text-gold shadow-sm"
-                        : "bg-ink-2/60 border-hairline text-ink-muted hover:text-ink-fg hover:bg-ink-3",
-                    )}
-                  >
-                    <cat.icon
-                      className={cn("size-3.5", isActive ? "text-gold" : "text-ink-muted")}
-                    />
-                    <span>{cat.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
       </motion.div>
 
