@@ -218,13 +218,6 @@ function EarnPage() {
 
   const socialLocked = socialCheck ? !socialCheck.complete : false;
 
-  const categories = [
-    { name: "All", icon: Sparkles },
-    { name: "Blog", icon: BookOpen },
-    { name: "Social", icon: MessageSquare },
-    { name: "Surveys", icon: Zap },
-    { name: "Videos", icon: Youtube },
-  ];
 
   const filteredTasks = (tasks as any[])?.filter((t: any) => {
     const isVerifiedToday =
