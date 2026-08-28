@@ -63,47 +63,37 @@ export function AnalyticsView() {
         : subDays(new Date(), 30).toISOString();
       const toStr = date?.to ? endOfDay(date.to).toISOString() : new Date().toISOString();
 
-      const [referralRes, signupRes, bonusRes] = await Promise.all([
-        supabase
-          .from("analytics_events" as any)
-          .select("*", { count: "exact", head: true })
-          .eq("event_name", "referral_code_validated")
-          .gte("created_at", fromStr)
-          .lte("created_at", toStr),
-        supabase
-          .from("analytics_events" as any)
-          .select("*", { count: "exact", head: true })
-          .eq("event_name", "signup_complete")
-          .gte("created_at", fromStr)
-          .lte("created_at", toStr),
-        supabase
-          .from("analytics_events" as any)
-          .select("*", { count: "exact", head: true })
-          .eq("event_name", "welcome_bonus_claimed")
-          .gte("created_at", fromStr)
-          .lte("created_at", toStr),
-      ]);
+      const { data, error } = await supabase.rpc("get_funnel_stats" as any, {
+        start_date: fromStr,
+        end_date: toStr,
+      });
+      if (error) throw error;
+
+      const row = (Array.isArray(data) ? data[0] : data) as
+        | { referrals: number; signups: number; bonuses: number }
+        | undefined;
 
       const funnel = [
         {
-          name: "Referral Validated",
-          count: referralRes.count || 0,
+          name: "Referrals",
+          count: Number(row?.referrals ?? 0),
           icon: TrendingUp,
           color: "#8b5cf6",
         },
         {
           name: "Signup Complete",
-          count: signupRes.count || 0,
+          count: Number(row?.signups ?? 0),
           icon: UserPlus,
           color: "#10b981",
         },
         {
           name: "Welcome Bonus Claimed",
-          count: bonusRes.count || 0,
+          count: Number(row?.bonuses ?? 0),
           icon: Gift,
           color: "#f59e0b",
         },
       ];
+
 
       return { funnel };
     },
@@ -137,6 +127,9 @@ export function AnalyticsView() {
           filter_task_id: taskId,
         }),
       ]);
+
+      if (dailyRes.error) throw dailyRes.error;
+      if (repeatableRes.error) throw repeatableRes.error;
 
       return {
         dailyCompletions: dailyRes.data || [],
