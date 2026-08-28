@@ -533,8 +533,8 @@ function EarnPage() {
         variants={fadeInUp}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
-        {filteredTasks?.length
-          ? (filteredTasks as any[]).map((task: any) => {
+        {shuffledTasks?.length
+          ? (shuffledTasks as any[]).map((task: any) => {
               const isPending = task.status === "pending";
               const isVerified = task.status === "verified";
               const isRejected = task.status === "rejected";
@@ -910,7 +910,6 @@ function EarnPage() {
                   <Button
                     onClick={() => {
                       setActiveStatus("available");
-                      setActiveCategory("All");
                     }}
                     className="rounded-xl font-bold text-xs bg-gold text-ink hover:bg-gold-soft px-5 cursor-pointer"
                   >
