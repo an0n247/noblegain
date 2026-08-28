@@ -45,7 +45,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { parseTaskKeywordData } from "@/components/admin/TasksManager";
 
@@ -90,7 +90,6 @@ const staggerContainer = {
 
 function EarnPage() {
   const queryClient = useQueryClient();
-  const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState<
     "available" | "in_progress" | "completed" | "rejected"
   >("available");
