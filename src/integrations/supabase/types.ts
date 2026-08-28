@@ -893,62 +893,36 @@ export type Database = {
       }
       claim_daily_reward: { Args: { _user_id: string }; Returns: Json }
       claim_welcome_bonus: { Args: { _user_id: string }; Returns: Json }
-      get_daily_task_completions:
-        | {
-            Args: { end_date: string; start_date: string }
-            Returns: {
-              completion_date: string
-              count: number
-            }[]
-          }
-        | {
-            Args: {
-              end_date: string
-              filter_task_id?: string
-              start_date: string
-            }
-            Returns: {
-              completion_date: string
-              count: number
-            }[]
-          }
-        | {
-            Args: {
-              end_date: string
-              filter_task_id?: string
-              granularity?: string
-              start_date: string
-            }
-            Returns: {
-              completion_date: string
-              count: number
-            }[]
-          }
-      get_repeatable_task_stats:
-        | {
-            Args: { end_date: string; start_date: string }
-            Returns: {
-              claims_per_user: number
-              id: string
-              title: string
-              total_claims: number
-              unique_users: number
-            }[]
-          }
-        | {
-            Args: {
-              end_date: string
-              filter_task_id?: string
-              start_date: string
-            }
-            Returns: {
-              claims_per_user: number
-              id: string
-              title: string
-              total_claims: number
-              unique_users: number
-            }[]
-          }
+      get_daily_task_completions: {
+        Args: {
+          end_date: string
+          filter_task_id?: string
+          granularity?: string
+          start_date: string
+        }
+        Returns: {
+          completion_date: string
+          count: number
+        }[]
+      }
+      get_funnel_stats: {
+        Args: { end_date: string; start_date: string }
+        Returns: {
+          bonuses: number
+          referrals: number
+          signups: number
+        }[]
+      }
+      get_repeatable_task_stats: {
+        Args: { end_date: string; filter_task_id?: string; start_date: string }
+        Returns: {
+          claims_per_user: number
+          id: string
+          title: string
+          total_claims: number
+          unique_users: number
+        }[]
+      }
       handle_admin_points_adjustment: {
         Args: {
           p_action_type: string
