@@ -5,17 +5,13 @@ import {
   Coins,
   CheckCircle2,
   Star,
-  Zap,
   Twitter,
-  Youtube,
-  MessageSquare,
   Clock,
   ShieldCheck,
   Loader2,
   Play,
   CheckCircle,
   XCircle,
-  Sparkles,
   ArrowRight,
   Flame,
   Target,
@@ -24,7 +20,6 @@ import {
   AlertTriangle,
   Layers,
   Filter,
-  BookOpen,
   KeyRound,
   HelpCircle,
   ListTodo,
@@ -45,7 +40,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { parseTaskKeywordData } from "@/components/admin/TasksManager";
 
@@ -90,7 +85,6 @@ const staggerContainer = {
 
 function EarnPage() {
   const queryClient = useQueryClient();
-  const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState<
     "available" | "in_progress" | "completed" | "rejected"
   >("available");
@@ -219,13 +213,6 @@ function EarnPage() {
 
   const socialLocked = socialCheck ? !socialCheck.complete : false;
 
-  const categories = [
-    { name: "All", icon: Sparkles },
-    { name: "Blog", icon: BookOpen },
-    { name: "Social", icon: MessageSquare },
-    { name: "Surveys", icon: Zap },
-    { name: "Videos", icon: Youtube },
-  ];
 
   const filteredTasks = (tasks as any[])?.filter((t: any) => {
     const isVerifiedToday =
@@ -248,13 +235,19 @@ function EarnPage() {
       matchesStatus = !isPending && !isVerifiedToday && !isCompletedNonRepeatable;
     }
 
-    const matchesCategory =
-      activeStatus !== "available" ||
-      activeCategory === "All" ||
-      t.category?.toLowerCase() === activeCategory.toLowerCase();
-
-    return matchesStatus && matchesCategory;
+    return matchesStatus;
   });
+
+  // Shuffle tasks per user so each user sees a random order
+  const shuffledTasks = useMemo(() => {
+    if (!filteredTasks) return filteredTasks;
+    const arr = [...filteredTasks];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [tasks, activeStatus]);
 
   // Calculate quick summary metrics
   const availableCount =
@@ -527,35 +520,6 @@ function EarnPage() {
             </button>
           </div>
 
-          {/* Category Chips (Only on Available status) */}
-          {activeStatus === "available" && (
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none items-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-muted hidden sm:inline mr-1 flex items-center gap-1">
-                <Filter className="size-3.5" /> Category:
-              </span>
-              {categories.map((cat) => {
-                const isActive = activeCategory === cat.name;
-                return (
-                  <button
-                    key={cat.name}
-                    type="button"
-                    onClick={() => setActiveCategory(cat.name)}
-                    className={cn(
-                      "rounded-xl font-bold h-9 px-3.5 text-xs shrink-0 transition-all flex items-center gap-1.5 border cursor-pointer",
-                      isActive
-                        ? "bg-gold/15 border-gold/40 text-gold shadow-sm"
-                        : "bg-ink-2/60 border-hairline text-ink-muted hover:text-ink-fg hover:bg-ink-3",
-                    )}
-                  >
-                    <cat.icon
-                      className={cn("size-3.5", isActive ? "text-gold" : "text-ink-muted")}
-                    />
-                    <span>{cat.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
       </motion.div>
 
@@ -564,8 +528,8 @@ function EarnPage() {
         variants={fadeInUp}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
-        {filteredTasks?.length
-          ? (filteredTasks as any[]).map((task: any) => {
+        {shuffledTasks?.length
+          ? (shuffledTasks as any[]).map((task: any) => {
               const isPending = task.status === "pending";
               const isVerified = task.status === "verified";
               const isRejected = task.status === "rejected";
@@ -941,7 +905,6 @@ function EarnPage() {
                   <Button
                     onClick={() => {
                       setActiveStatus("available");
-                      setActiveCategory("All");
                     }}
                     className="rounded-xl font-bold text-xs bg-gold text-ink hover:bg-gold-soft px-5 cursor-pointer"
                   >
