@@ -30,12 +30,18 @@
 
 /* RGB neon light that travels around the edge of a rounded container */
 
+@property --rgb-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 @keyframes rgb-rotate {
   0% {
-    transform: rotate(0deg);
+    --rgb-angle: 0deg;
   }
   100% {
-    transform: rotate(360deg);
+    --rgb-angle: 360deg;
   }
 }
 
@@ -45,31 +51,20 @@
   padding: 1.5px;
   border-radius: 1rem;
   overflow: hidden;
-}
-
-.rgb-neon-wrapper::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
   background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 0, 0, 0.95) 50deg,
-    rgba(255, 127, 0, 0.95) 65deg,
-    rgba(255, 255, 0, 0.95) 80deg,
-    rgba(0, 255, 0, 0.95) 95deg,
-    rgba(0, 255, 255, 0.95) 110deg,
-    rgba(0, 0, 255, 0.95) 125deg,
-    rgba(139, 0, 255, 0.95) 140deg,
-    transparent 155deg,
-    transparent 360deg
+    from var(--rgb-angle),
+    rgba(255, 0, 0, 1) 0deg,
+    rgba(255, 127, 0, 1) 65deg,
+    rgba(255, 255, 0, 1) 105deg,
+    rgba(0, 255, 0, 1) 145deg,
+    rgba(0, 255, 255, 1) 185deg,
+    rgba(0, 0, 255, 1) 225deg,
+    rgba(139, 0, 255, 1) 265deg,
+    rgba(255, 0, 0, 1) 320deg,
+    rgba(255, 0, 0, 1) 360deg
   );
   animation: rgb-rotate 3s linear infinite;
-  pointer-events: none;
-  z-index: 0;
+  box-shadow: 0 0 10px rgba(0, 255, 220, 0.35);
 }
 
 .rgb-neon-inner {
