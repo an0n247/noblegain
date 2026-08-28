@@ -128,6 +128,9 @@ export function AnalyticsView() {
         }),
       ]);
 
+      if (dailyRes.error) throw dailyRes.error;
+      if (repeatableRes.error) throw repeatableRes.error;
+
       return {
         dailyCompletions: dailyRes.data || [],
         repeatableStats: repeatableRes.data || [],
