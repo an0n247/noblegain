@@ -365,7 +365,7 @@ function AuthPage() {
     try {
       const signupIp = await getClientIp().then((r) => r.ip).catch(() => null);
 
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -380,6 +380,12 @@ function AuthPage() {
       });
 
       if (signUpError) throw signUpError;
+
+      // Supabase returns a fake "success" (obfuscated user with no identities)
+      // when the email is already registered — detect and block it.
+      if (signUpData.user && signUpData.user.identities?.length === 0) {
+        throw new Error("An account with this email already exists. Please sign in instead.");
+      }
 
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email,
