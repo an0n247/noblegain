@@ -492,6 +492,30 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_otps: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
       task_submissions: {
         Row: {
           admin_note: string | null
