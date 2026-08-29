@@ -4,7 +4,7 @@ i want to vibe code a website
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://noblegain.lovable.app
+**Live app**: https://noblegain.bytsphere.buzz
 
 ## Build with Lovable
 

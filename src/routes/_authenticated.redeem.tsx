@@ -51,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/redeem")({
           "Turn your points into real-world rewards. Browse our catalog of gift cards and premium vouchers.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),

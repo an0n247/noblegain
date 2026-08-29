@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
           "See your latest earnings, claim daily bonuses, and track your progress toward your next big reward.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
@@ -330,7 +330,7 @@ function Dashboard() {
   const referralLink =
     typeof window !== "undefined"
       ? `${window.location.origin}/auth?ref=${referralCode}&mode=signup`
-      : `https://noblegain.lovable.app/auth?ref=${referralCode}&mode=signup`;
+      : `/auth?ref=${referralCode}&mode=signup`;
 
   const referralShareMessage = `🚀 Join me on Noble Gain and start earning real rewards and cash for completing quick daily tasks! Sign up with my invite link to get a 50 PTS welcome bonus:\n\n${referralLink}\n\nInvite Code: ${referralCode}`;
 

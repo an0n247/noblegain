@@ -17,7 +17,7 @@ export const getClientIp = createServerFn({ method: "GET" }).handler(async () =>
  */
 export const recordClientSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
+  .validator((data) =>
     z.object({ fingerprint: z.string().min(1).max(128).nullish() }).parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {

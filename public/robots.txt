@@ -14,4 +14,4 @@ Disallow: /profile
 Disallow: /redeem
 Disallow: /refer
 
-Sitemap: https://noblegain.lovable.app/sitemap.xml
+Sitemap: https://noblegain.bytsphere.buzz/sitemap.xml

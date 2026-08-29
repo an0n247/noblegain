@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/refer")({
           "Share your unique referral link and earn points for every friend who joins. The fastest way to grow your balance.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),

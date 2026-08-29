@@ -6,7 +6,7 @@ import { Lock, ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/terms")({
   head: () => {
     const url =
-      typeof window !== "undefined" ? window.location.origin : "https://noblegain.lovable.app";
+      typeof window !== "undefined" ? window.location.origin : "";
     const canonicalUrl = `${url}/terms`;
 
     return {
