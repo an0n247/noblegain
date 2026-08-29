@@ -61,3 +61,19 @@ export function getUsernameStatus(username: string, available: boolean | null = 
     message: "Username available.",
   };
 }
+
+export type UsernameFieldState = {
+  loading: boolean;
+  available: boolean | null;
+  message: string;
+  error: boolean;
+};
+
+export function toUsernameFieldState(status: UsernameStatus): UsernameFieldState {
+  return {
+    loading: status.state === "loading",
+    available: status.state === "success" ? true : status.state === "error" ? false : null,
+    message: status.message,
+    error: status.state === "error",
+  };
+}
