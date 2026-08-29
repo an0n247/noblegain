@@ -891,6 +891,10 @@ export type Database = {
           username: string
         }[]
       }
+      check_username_available: {
+        Args: { _username: string }
+        Returns: boolean
+      }
       claim_daily_reward: { Args: { _user_id: string }; Returns: Json }
       claim_welcome_bonus: { Args: { _user_id: string }; Returns: Json }
       get_daily_task_completions: {
