@@ -96,34 +96,17 @@ function ReferralPage() {
     queryFn: async () => {
       if (!profile?.id) return [];
 
-      const { data: referralsData, error: referralsError } = await supabase
-        .from("referrals")
-        .select("referee_id")
-        .eq("referrer_id", profile.id)
-        .order("created_at", { ascending: false });
+      // Safe referee summary: identity + completion booleans only (no PII exposure)
+      const { data: refereesData, error: refereesError } = await supabase.rpc(
+        "get_my_referees" as any,
+      );
 
-      if (referralsError) {
-        console.error("Error fetching referrals:", referralsError);
+      if (refereesError) {
+        console.error("Error fetching referred profiles:", refereesError);
         return [];
       }
 
-      if (!referralsData || referralsData.length === 0) return [];
-
-      const refereeIds = referralsData.map((r) => r.referee_id);
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select(
-          "id, full_name, username, email, created_at, avatar_url, phone_number, twitter_handle, telegram_handle, facebook_handle, instagram_handle",
-        )
-        .in("id", refereeIds);
-
-      if (profilesError) {
-        console.error("Error fetching referred profiles:", profilesError);
-        return [];
-      }
-
-      return profilesData || [];
+      return (refereesData as any[]) || [];
     },
     enabled: !!profile?.id,
   });
@@ -229,13 +212,8 @@ function ReferralPage() {
                   <div className="divide-y divide-hairline">
                     {referrals.map((ref: any) => {
                       const hasProfile = !!(ref.full_name && ref.username);
-                      const hasPhone = !!ref.phone_number;
-                      const hasSocial = !!(
-                        ref.twitter_handle ||
-                        ref.telegram_handle ||
-                        ref.facebook_handle ||
-                        ref.instagram_handle
-                      );
+                      const hasPhone = !!ref.has_phone;
+                      const hasSocial = !!ref.has_social;
                       const isComplete = hasProfile && hasPhone && hasSocial;
 
                       return (

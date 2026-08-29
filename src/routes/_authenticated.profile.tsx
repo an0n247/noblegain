@@ -52,7 +52,7 @@ import { uploadImageWithFallback } from "@/lib/upload-image";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import { getUsernameStatus, normalizeUsername } from "@/lib/username-validation";
+import { getUsernameStatus, normalizeUsername, toUsernameFieldState } from "@/lib/username-validation";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -197,7 +197,7 @@ function ProfilePage() {
     }
 
     if (normalized.length < 3) {
-      setUsernameStatus(getUsernameStatus(rawValue));
+      setUsernameStatus(toUsernameFieldState(getUsernameStatus(rawValue)));
       return;
     }
 
@@ -454,9 +454,9 @@ function ProfilePage() {
       } = await supabase.auth.getUser();
       if (!user) return 0;
       const { count } = await supabase
-        .from("profiles")
+        .from("referrals")
         .select("*", { count: "exact", head: true })
-        .eq("referred_by", user.id);
+        .eq("referrer_id", user.id);
       return count || 0;
     },
   });

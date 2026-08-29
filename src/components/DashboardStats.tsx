@@ -28,9 +28,9 @@ export function DashboardStats() {
       } = await supabase.auth.getUser();
       if (!user) return 0;
       const { count } = await supabase
-        .from("profiles")
+        .from("referrals")
         .select("*", { count: "exact", head: true })
-        .eq("referred_by", user.id);
+        .eq("referrer_id", user.id);
       return count || 0;
     },
   });

@@ -11,7 +11,7 @@ describe("resolveThemePreference", () => {
       },
       setItem: () => undefined,
       removeItem: () => undefined,
-    } as Storage;
+    } as unknown as Storage;
 
     expect(resolveThemePreference("noble-gain-theme", "system", storage)).toBe("dark");
   });

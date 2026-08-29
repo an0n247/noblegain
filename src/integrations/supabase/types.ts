@@ -891,6 +891,10 @@ export type Database = {
           username: string
         }[]
       }
+      check_username_available: {
+        Args: { _username: string }
+        Returns: boolean
+      }
       claim_daily_reward: { Args: { _user_id: string }; Returns: Json }
       claim_welcome_bonus: { Args: { _user_id: string }; Returns: Json }
       get_daily_task_completions: {
@@ -911,6 +915,18 @@ export type Database = {
           bonuses: number
           referrals: number
           signups: number
+        }[]
+      }
+      get_my_referees: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          has_phone: boolean
+          has_social: boolean
+          id: string
+          username: string
         }[]
       }
       get_repeatable_task_stats: {

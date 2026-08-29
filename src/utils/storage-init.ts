@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export function shouldWarnForBucketError(
-  error: { message?: string; status?: number } | null,
+  error: { message?: string | undefined; status?: number | undefined } | null,
   bucket: string,
   hasData: boolean,
 ): boolean {
