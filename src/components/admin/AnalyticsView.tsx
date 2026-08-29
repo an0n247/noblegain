@@ -112,7 +112,7 @@ export function AnalyticsView() {
         ? startOfDay(date.from).toISOString()
         : subDays(new Date(), 30).toISOString();
       const toStr = date?.to ? endOfDay(date.to).toISOString() : new Date().toISOString();
-      const taskId = selectedTaskId === "all" ? null : selectedTaskId;
+      const taskId = selectedTaskId === "all" ? undefined : selectedTaskId;
 
       const [dailyRes, repeatableRes] = await Promise.all([
         supabase.rpc("get_daily_task_completions", {
