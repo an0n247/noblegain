@@ -148,6 +148,7 @@ function TermsPage() {
                   Get Started
                   <ArrowRight className="size-3.5" />
                 </Link>
+
               </div>
             </div>
           </div>

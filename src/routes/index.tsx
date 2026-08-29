@@ -384,28 +384,48 @@ function HeroSection() {
             points you can redeem. Every value, status and payout stays visible.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
-            <Link
-              to="/auth"
-              search={{ mode: "signup" }}
-              className="group inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gold px-4 text-sm font-bold tracking-tight text-ink transition-transform duration-200 hover:-translate-y-0.5 sm:h-13 sm:flex-none"
-            >
-              Get Started
-              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
+          <div className="mt-9 flex flex-col gap-3">
+            <div className="flex gap-3 sm:hidden">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" }}
+                className="group inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gold px-4 text-sm font-bold tracking-tight text-ink transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                Get Started
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                to="/auth"
+                search={{ mode: "login" }}
+                className="inline-flex h-12 flex-1 items-center justify-center rounded-xl border border-hairline bg-ink-2/70 px-4 text-sm font-bold tracking-tight text-ink-fg transition-colors duration-200 hover:border-gold/30 hover:text-gold"
+              >
+                Sign in
+              </Link>
+            </div>
+
+            <div className="hidden sm:flex sm:items-center sm:gap-3">
+              <Link
+                to="/auth"
+                search={{ mode: "signup" }}
+                className="group inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gold px-4 text-sm font-bold tracking-tight text-ink transition-transform duration-200 hover:-translate-y-0.5 sm:h-13 sm:flex-none"
+              >
+                Get Started
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+              <a
+                href="#how-it-works"
+                className="inline-flex h-12 flex-1 items-center justify-center rounded-xl border border-hairline px-6 text-sm font-bold tracking-tight text-ink-fg transition-colors duration-200 hover:border-gold/30 hover:text-gold sm:h-13 sm:flex-none"
+              >
+                See how it works
+              </a>
+            </div>
+
             <a
               href="#how-it-works"
-              className="inline-flex h-12 flex-1 items-center justify-center rounded-xl border border-hairline px-6 text-sm font-bold tracking-tight text-ink-fg transition-colors duration-200 hover:border-gold/30 hover:text-gold sm:h-13 sm:flex-none"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-hairline px-6 text-sm font-bold tracking-tight text-ink-fg transition-colors duration-200 hover:border-gold/30 hover:text-gold sm:hidden"
             >
               See how it works
             </a>
-            <Link
-              to="/auth"
-              search={{ mode: "login" }}
-              className="inline-flex h-12 flex-1 items-center justify-center rounded-xl border border-hairline bg-ink-2/70 px-4 text-sm font-bold tracking-tight text-ink-fg transition-colors duration-200 hover:border-gold/30 hover:text-gold md:hidden sm:h-13 sm:flex-none"
-            >
-              Sign in
-            </Link>
           </div>
 
           <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] font-medium text-ink-muted">
@@ -787,6 +807,7 @@ function CtaSection() {
             </p>
             <Link
               to="/auth"
+              search={{ mode: "signup" }}
               className="group mt-8 inline-flex h-12 items-center gap-2 rounded-xl bg-gold px-6 text-sm font-bold tracking-tight text-ink transition-transform duration-200 hover:-translate-y-0.5 sm:h-13"
             >
               Get Started

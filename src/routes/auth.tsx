@@ -194,16 +194,13 @@ function AuthPage() {
     });
 
     try {
-      const { data, error: queryError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("username", normalized)
-        .limit(1)
-        .maybeSingle();
+      const { data, error: rpcError } = await supabase.rpc("check_username_available", {
+        _username: normalized,
+      });
 
-      if (queryError && queryError.code !== "PGRST116") throw queryError;
+      if (rpcError) throw rpcError;
 
-      const available = !data;
+      const available = data === true;
       setUsernameStatus({
         loading: false,
         available,
@@ -510,14 +507,13 @@ function AuthPage() {
   );
 
   const BackLink = () => (
-    <button
-      type="button"
-      onClick={() => navigate({ to: "/" })}
+    <Link
+      to="/"
       className="mb-2 sm:mb-3 inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-muted-foreground transition-colors hover:text-primary"
     >
       <ArrowLeft className="h-3.5 w-3.5" />
       Back to home
-    </button>
+    </Link>
   );
 
   if (showVerification) {

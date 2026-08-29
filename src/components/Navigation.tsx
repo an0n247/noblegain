@@ -224,7 +224,7 @@ export function Navigation() {
                     className="font-bold uppercase premium-shadow hover:scale-105 transition-transform"
                     asChild
                   >
-                    <Link to="/auth">Get Started</Link>
+                    <Link to="/auth" search={{ mode: "signup" }}>Get Started</Link>
                   </Button>
                 </>
               )}
@@ -297,7 +297,11 @@ export function Navigation() {
                 className="w-full font-bold uppercase h-12 rounded-2xl premium-shadow hover:scale-105 transition-transform"
                 asChild
               >
-                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link
+                  to="/auth"
+                  search={{ mode: "signup" }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   Get Started
                 </Link>
               </Button>

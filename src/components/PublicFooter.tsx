@@ -62,7 +62,7 @@ export function PublicFooter() {
                 </a>
               </li>
               <li>
-                <Link to="/auth" className="hover:text-ink-fg">
+                <Link to="/auth" search={{ mode: "signup" }} className="hover:text-ink-fg">
                   Get started
                 </Link>
               </li>

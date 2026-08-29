@@ -219,16 +219,13 @@ function ProfilePage() {
     });
 
     try {
-      const { data, error: queryError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("username", normalized)
-        .limit(1)
-        .maybeSingle();
+      const { data, error: rpcError } = await supabase.rpc("check_username_available", {
+        _username: normalized,
+      });
 
-      if (queryError && queryError.code !== "PGRST116") throw queryError;
+      if (rpcError) throw rpcError;
 
-      const available = !data;
+      const available = data === true;
       setUsernameStatus({
         loading: false,
         available,
