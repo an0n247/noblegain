@@ -387,15 +387,7 @@ function AuthPage() {
         throw new Error("An account with this email already exists. Please sign in instead.");
       }
 
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: `${window.location.origin}/auth`,
-        },
-      });
-
-      if (otpError) throw otpError;
+      await sendSignupOtp({ data: { email } });
 
       setVerificationCode("");
       setShowVerification(true);
@@ -418,13 +410,14 @@ function AuthPage() {
     setError("");
 
     try {
-      const { error } = await supabase.auth.verifyOtp({
+      await verifySignupOtp({ data: { email, code: token } });
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        token,
-        type: "email",
+        password,
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
 
       toast.success("Email verified successfully. Welcome to Noble Gain.");
       navigate({ to: (search.redirect as any) || "/dashboard" });
@@ -439,16 +432,13 @@ function AuthPage() {
     setResending(true);
     setError("");
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: `${window.location.origin}/auth`,
-        },
-      });
+      const result = await sendSignupOtp({ data: { email } });
 
-      if (error) throw error;
-      toast.success("A fresh verification code has been sent to your email.");
+      if (result.cooldown > 0) {
+        toast.info(`Please wait ${result.cooldown}s before requesting another code.`);
+      } else {
+        toast.success("A fresh verification code has been sent to your email.");
+      }
     } catch (error: any) {
       setError(error.message || "Unable to resend the code.");
     } finally {
