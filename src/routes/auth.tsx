@@ -365,7 +365,7 @@ function AuthPage() {
     try {
       const signupIp = await getClientIp().then((r) => r.ip).catch(() => null);
 
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
