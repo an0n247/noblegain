@@ -45,12 +45,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { ImageCropper } from "@/components/ImageCropper";
 import { uploadImageWithFallback } from "@/lib/upload-image";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import { getUsernameStatus, normalizeUsername } from "@/lib/username-validation";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -67,7 +69,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
         content: "Check your earning stats, social connections, and profile details.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
@@ -95,6 +97,17 @@ function ProfilePage() {
   const queryClient = useQueryClient();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [usernameStatus, setUsernameStatus] = useState<{
+    loading: boolean;
+    available: boolean | null;
+    message: string;
+    error: boolean;
+  }>({
+    loading: false,
+    available: null,
+    message: "",
+    error: false,
+  });
   const [countryCode, setCountryCode] = useState("+234");
   const [phoneBody, setPhoneBody] = useState("");
   const [twitter, setTwitter] = useState("");
@@ -158,9 +171,84 @@ function ProfilePage() {
 
   useEffect(() => {
     if (!isEditing && profile) {
+      const nextVerified = { twitter: !!profile.twitter_handle, facebook: !!profile.facebook_handle, telegram: !!profile.telegram_handle, instagram: !!profile.instagram_handle };
+      setVerifiedHandles((prev) => ({ ...prev, ...nextVerified }));
       resetForm();
     }
   }, [profile, isEditing]);
+
+  const checkUsernameAvailability = useCallback(async (rawValue: string) => {
+    const normalized = normalizeUsername(rawValue);
+    const currentUsername = normalizeUsername(profile?.username || "");
+
+    if (!normalized) {
+      setUsernameStatus({ loading: false, available: null, message: "", error: false });
+      return;
+    }
+
+    if (normalized === currentUsername) {
+      setUsernameStatus({
+        loading: false,
+        available: true,
+        message: "This is your current username.",
+        error: false,
+      });
+      return;
+    }
+
+    if (normalized.length < 3) {
+      setUsernameStatus(getUsernameStatus(rawValue));
+      return;
+    }
+
+    if (!/^[a-z0-9_]+$/.test(normalized)) {
+      setUsernameStatus({
+        loading: false,
+        available: false,
+        message: "Use only letters, numbers, and underscores.",
+        error: true,
+      });
+      return;
+    }
+
+    setUsernameStatus({
+      loading: true,
+      available: null,
+      message: "Checking username availability...",
+      error: false,
+    });
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("username", normalized)
+        .limit(1)
+        .maybeSingle();
+
+      if (queryError && queryError.code !== "PGRST116") throw queryError;
+
+      const available = !data;
+      setUsernameStatus({
+        loading: false,
+        available,
+        message: available ? "Username available." : "Username is already taken.",
+        error: !available,
+      });
+    } catch (error) {
+      console.error("Username availability check failed:", error);
+      setUsernameStatus({
+        loading: false,
+        available: null,
+        message: "Could not verify username availability. Please try again.",
+        error: true,
+      });
+    }
+  }, [profile?.username]);
+
+  const debouncedUsernameCheck = useDebouncedCallback((nextUsername: string) => {
+    void checkUsernameAvailability(nextUsername);
+  }, 500);
 
   const handleManualVerify = async (type: string, handle: string) => {
     if (!handle || getValidationError(handle, type)) return;
@@ -245,6 +333,20 @@ function ProfilePage() {
 
   const updateProfile = useMutation({
     mutationFn: async (updates: any) => {
+      if (updates.username) {
+        const normalizedUsername = normalizeUsername(updates.username);
+        if (normalizedUsername.length < 3) {
+          throw new Error("Username must be at least 3 characters.");
+        }
+        if (!/^[a-z0-9_]+$/.test(normalizedUsername)) {
+          throw new Error("Username can only contain letters, numbers, and underscores.");
+        }
+        const currentUsername = normalizeUsername(profile?.username || "");
+        if (normalizedUsername !== currentUsername && (usernameStatus.loading || usernameStatus.available === false || usernameStatus.error)) {
+          throw new Error("Please choose an available username.");
+        }
+      }
+
       if (updates.twitter_handle && !validateHandle(updates.twitter_handle, "twitter")) {
         throw new Error("Invalid Twitter handle format");
       }
@@ -620,12 +722,65 @@ function ProfilePage() {
                     >
                       Username
                     </Label>
-                    <Input
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="username"
+                        value={username}
+                        onChange={(e) => {
+                          const nextValue = normalizeUsername(e.target.value);
+                          setUsername(nextValue);
+
+                          if (!nextValue) {
+                            setUsernameStatus({
+                              loading: false,
+                              available: null,
+                              message: "",
+                              error: false,
+                            });
+                            return;
+                          }
+
+                          if (nextValue.length < 3 || !/^[a-z0-9_]+$/.test(nextValue)) {
+                            setUsernameStatus({
+                              loading: false,
+                              available: false,
+                              message: getUsernameStatus(nextValue).message,
+                              error: true,
+                            });
+                            return;
+                          }
+
+                          debouncedUsernameCheck(nextValue);
+                        }}
+                        className={cn(
+                          "rounded-xl h-11 bg-ink border-hairline text-ink-fg font-medium pr-12",
+                          usernameStatus.available === true && "border-green-500/60",
+                          usernameStatus.available === false && "border-destructive/60",
+                        )}
+                      />
+                      {usernameStatus.loading && (
+                        <Loader2 className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                      )}
+                      {usernameStatus.available === true && !usernameStatus.loading && (
+                        <CheckCircle2 className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                      )}
+                      {usernameStatus.available === false && !usernameStatus.loading && (
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-destructive">
+                          !
+                        </span>
+                      )}
+                    </div>
+                    {usernameStatus.message && (
+                      <p
+                        className={cn(
+                          "text-xs font-semibold",
+                          usernameStatus.error ? "text-destructive" : "text-green-600",
+                        )}
+                      >
+                        {usernameStatus.error ? "✕ " : "✓ "}
+                        {usernameStatus.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
@@ -955,9 +1110,18 @@ function ProfilePage() {
                     className="flex-[2] rounded-xl font-bold h-11 text-xs bg-gold text-ink hover:bg-gold-soft cursor-pointer shadow-md shadow-gold/10 font-black"
                     onClick={() => {
                       const combinedPhone = `${countryCode} ${phoneBody}`.trim();
+                      const normalizedUsername = normalizeUsername(username);
+
+                      if (normalizedUsername && normalizedUsername !== normalizeUsername(profile?.username || "")) {
+                        if (usernameStatus.loading || usernameStatus.available === false || usernameStatus.error) {
+                          toast.error("Please choose an available username before saving.");
+                          return;
+                        }
+                      }
+
                       updateProfile.mutate({
                         full_name: fullName,
-                        username: username,
+                        username: normalizedUsername,
                         avatar_url: avatarUrl,
                         phone_number: combinedPhone,
                         twitter_handle: twitter,
@@ -966,7 +1130,7 @@ function ProfilePage() {
                         instagram_handle: instagram,
                       });
                     }}
-                    disabled={updateProfile.isPending}
+                    disabled={updateProfile.isPending || usernameStatus.loading}
                   >
                     {updateProfile.isPending ? (
                       <span className="flex items-center gap-2">

@@ -17,7 +17,7 @@ import { z } from "zod";
  */
 
 export const getOptimizedImageUrl = createServerFn({ method: "GET" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         path: z.string(),

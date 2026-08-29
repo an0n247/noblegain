@@ -59,7 +59,7 @@ export const Route = createFileRoute("/_authenticated/earn")({
         content: "Complete daily verified tasks and watch your points grow in real-time.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),

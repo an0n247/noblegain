@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -37,6 +37,7 @@ import { toast } from "sonner";
 import { getClientIp } from "@/lib/session-tracking.functions";
 import { z } from "zod";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import { getUsernameStatus, normalizeUsername } from "@/lib/username-validation";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -54,7 +55,7 @@ export const Route = createFileRoute("/auth")({
           "Sign in to manage your rewards or create a new account and get a 50-point welcome bonus with a referral code!",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://noblegain.lovable.app/logo.png" },
+      { property: "og:image", content: "/logo.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
@@ -84,6 +85,17 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [referralCode, setReferralCode] = useState(search.ref || "");
+  const [usernameStatus, setUsernameStatus] = useState<{
+    loading: boolean;
+    available: boolean | null;
+    message: string;
+    error: boolean;
+  }>({
+    loading: false,
+    available: null,
+    message: "",
+    error: false,
+  });
   const [referralStatus, setReferralStatus] = useState<{
     loading: boolean;
     owner: string | null;
@@ -96,6 +108,8 @@ function AuthPage() {
     message: null,
   });
   const [showVerification, setShowVerification] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
@@ -154,6 +168,59 @@ function AuthPage() {
     }
   }, [search.ref]);
 
+  const checkUsernameAvailability = useCallback(async (rawValue: string) => {
+    const normalized = normalizeUsername(rawValue);
+
+    if (!normalized || normalized.length < 3) {
+      setUsernameStatus(getUsernameStatus(rawValue));
+      return;
+    }
+
+    if (!/^[a-z0-9_]+$/.test(normalized)) {
+      setUsernameStatus({
+        loading: false,
+        available: false,
+        error: true,
+        message: "Use only letters, numbers, and underscores.",
+      });
+      return;
+    }
+
+    setUsernameStatus({
+      loading: true,
+      available: null,
+      error: false,
+      message: "Checking username availability...",
+    });
+
+    try {
+      const { data, error: queryError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("username", normalized)
+        .limit(1)
+        .maybeSingle();
+
+      if (queryError && queryError.code !== "PGRST116") throw queryError;
+
+      const available = !data;
+      setUsernameStatus({
+        loading: false,
+        available,
+        error: !available,
+        message: available ? "Username available." : "Username is already taken.",
+      });
+    } catch (error) {
+      console.error("Username availability check failed:", error);
+      setUsernameStatus({
+        loading: false,
+        available: null,
+        error: true,
+        message: "Could not verify username availability. Please try again.",
+      });
+    }
+  }, []);
+
   const validateReferral = async (code: string) => {
     if (!code || code.trim().length < 3) {
       setReferralStatus({ loading: false, owner: null, error: false, message: null });
@@ -196,16 +263,18 @@ function AuthPage() {
     }
   };
 
+  const debouncedUsernameCheck = useDebouncedCallback((nextUsername: string) => {
+    void checkUsernameAvailability(nextUsername);
+  }, 500);
+
+  const debouncedReferralCheck = useDebouncedCallback((nextCode: string) => {
+    void validateReferral(nextCode);
+  }, 500);
+
   const handleReferralChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
     setReferralCode(val);
-
-    // Manual debounce using a simple ref-like approach via window for stability in this env
-    const timeoutKey = "_auth_ref_timeout";
-    if ((window as any)[timeoutKey]) clearTimeout((window as any)[timeoutKey]);
-    (window as any)[timeoutKey] = setTimeout(() => {
-      validateReferral(val);
-    }, 500);
+    debouncedReferralCheck(val);
   };
 
   const validate = (type: "login" | "signup") => {
@@ -221,6 +290,18 @@ function AuthPage() {
       }
       if (username.length < 3) {
         setError("Username must be at least 3 characters.");
+        return false;
+      }
+      if (!/^[a-z0-9_]+$/.test(username)) {
+        setError("Username can only contain letters, numbers, and underscores.");
+        return false;
+      }
+      if (usernameStatus.loading) {
+        setError("Please wait while we verify your username.");
+        return false;
+      }
+      if (usernameStatus.available === false || usernameStatus.error) {
+        setError("Please choose an available username.");
         return false;
       }
       if (!fullName) {
@@ -283,13 +364,11 @@ function AuthPage() {
     e.preventDefault();
     if (!validate("signup")) return;
     setLoading(true);
+    setError("");
     try {
-      // Resolve the real client IP server-side; null when it can't be determined.
-      const signupIp = await getClientIp()
-        .then((r) => r.ip)
-        .catch(() => null);
+      const signupIp = await getClientIp().then((r) => r.ip).catch(() => null);
 
-      const options: any = {
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -301,17 +380,55 @@ function AuthPage() {
             ip_address: signupIp,
           },
         },
-      };
+      });
 
-      const { error } = await supabase.auth.signUp(options);
-      if (error) throw error;
+      if (signUpError) throw signUpError;
 
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
+      });
+
+      if (otpError) throw otpError;
+
+      setVerificationCode("");
       setShowVerification(true);
-      toast.success("Verification link sent to your email!");
+      toast.success("A secure One-Time Password has been sent to your email.");
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || "Unable to send verification code. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const token = verificationCode.trim();
+    if (!token || token.length < 6) {
+      setError("Enter the 6-digit verification code from your email.");
+      return;
+    }
+
+    setVerifyingOtp(true);
+    setError("");
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "email",
+      });
+
+      if (error) throw error;
+
+      toast.success("Email verified successfully. Welcome to Noble Gain.");
+      navigate({ to: (search.redirect as any) || "/dashboard" });
+    } catch (error: any) {
+      setError(error.message || "Unable to verify code. Please request a new one.");
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -319,17 +436,18 @@ function AuthPage() {
     setResending(true);
     setError("");
     try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: email,
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
         options: {
-          emailRedirectTo: window.location.origin + "/dashboard",
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/auth`,
         },
       });
+
       if (error) throw error;
-      toast.success("A fresh verification link has been sent to your email!");
+      toast.success("A fresh verification code has been sent to your email.");
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || "Unable to resend the code.");
     } finally {
       setResending(false);
     }
@@ -431,30 +549,27 @@ function AuthPage() {
 
             <div>
               <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground uppercase">
-                Check Your Inbox
+                Enter Your Code
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                We have sent a secure verification link to{" "}
-                <span className="font-bold text-foreground break-all">{email}</span>. Click the link
-                in the message to activate your account.
+                We sent a 6-digit verification code to{" "}
+                <span className="font-bold text-foreground break-all">{email}</span>. Enter it below
+                to activate your account.
               </p>
             </div>
 
-            {/* Helpful Hint Card */}
-            <div className="rounded-2xl bg-accent/10 border border-border/60 p-3.5 text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
-                <Sparkles className="size-3.5 text-gold" />
-                <span>Quick Verification Tips:</span>
-              </div>
-              <ul className="text-[11px] sm:text-xs text-muted-foreground space-y-1 pl-4 list-disc font-medium">
-                <li>
-                  Check your <strong className="text-foreground">Spam</strong>,{" "}
-                  <strong className="text-foreground">Junk</strong>, or{" "}
-                  <strong className="text-foreground">Promotions</strong> folder if not in your
-                  primary inbox.
-                </li>
-                <li>This window will automatically proceed to your dashboard once confirmed.</li>
-              </ul>
+            <div className="rounded-2xl border border-border/70 bg-background/80 p-3.5 text-left">
+              <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Verification code
+              </Label>
+              <Input
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="123456"
+                className="mt-2 h-12 rounded-2xl border-border/70 bg-background text-center text-lg font-black tracking-[0.5em]"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+              />
             </div>
 
             {error && (
@@ -464,6 +579,20 @@ function AuthPage() {
             )}
 
             <div className="space-y-2 pt-1">
+              <Button
+                type="button"
+                onClick={handleVerifyOtp}
+                disabled={verifyingOtp}
+                className="w-full h-11 rounded-2xl bg-gold text-ink hover:bg-gold-soft font-black text-xs sm:text-sm"
+              >
+                {verifyingOtp ? (
+                  <Loader2 className="size-4 animate-spin mr-2" />
+                ) : (
+                  <CheckCircle2 className="size-4 mr-2" />
+                )}
+                {verifyingOtp ? "Verifying code..." : "Verify my email"}
+              </Button>
+
               <Button
                 type="button"
                 variant="outline"
@@ -476,7 +605,7 @@ function AuthPage() {
                 ) : (
                   <RefreshCw className="size-3.5 mr-2 text-gold" />
                 )}
-                {resending ? "Resending Link..." : "Resend Verification Link"}
+                {resending ? "Sending code..." : "Resend verification code"}
               </Button>
 
               <button
@@ -484,6 +613,7 @@ function AuthPage() {
                 className="w-full text-center text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors py-1 cursor-pointer"
                 onClick={() => {
                   setShowVerification(false);
+                  setVerificationCode("");
                   setActiveTab("login");
                 }}
               >
@@ -715,15 +845,68 @@ function AuthPage() {
                       <Label htmlFor="signup-username" className={fieldLabel}>
                         Username
                       </Label>
-                      <Input
-                        id="signup-username"
-                        className={fieldInput}
-                        value={username}
-                        onChange={(e) =>
-                          setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
-                        }
-                        required
-                      />
+                      <div className="relative">
+                        <Input
+                          id="signup-username"
+                          className={cn(
+                            fieldInput,
+                            "pr-12",
+                            usernameStatus.available === true && "border-green-500/60",
+                            usernameStatus.available === false && "border-destructive/60",
+                            usernameStatus.loading && "border-primary/60",
+                          )}
+                          value={username}
+                          onChange={(e) => {
+                            const nextValue = normalizeUsername(e.target.value);
+                            setUsername(nextValue);
+
+                            if (!nextValue) {
+                              setUsernameStatus({
+                                loading: false,
+                                available: null,
+                                error: false,
+                                message: "",
+                              });
+                              return;
+                            }
+
+                            if (nextValue.length < 3 || !/^[a-z0-9_]+$/.test(nextValue)) {
+                              setUsernameStatus({
+                                loading: false,
+                                available: false,
+                                error: true,
+                                message: getUsernameStatus(nextValue).message,
+                              });
+                              return;
+                            }
+
+                            debouncedUsernameCheck(nextValue);
+                          }}
+                          required
+                        />
+                        {usernameStatus.loading && (
+                          <Loader2 className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                        )}
+                        {usernameStatus.available === true && !usernameStatus.loading && (
+                          <CheckCircle2 className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                        )}
+                        {usernameStatus.available === false && !usernameStatus.loading && (
+                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-destructive">
+                            !
+                          </span>
+                        )}
+                      </div>
+                      {usernameStatus.message && (
+                        <p
+                          className={cn(
+                            "text-xs font-semibold",
+                            usernameStatus.error ? "text-destructive" : "text-green-600",
+                          )}
+                        >
+                          {usernameStatus.error ? "✕ " : "✓ "}
+                          {usernameStatus.message}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-1 sm:space-y-1.5">
                       <Label htmlFor="signup-email" className={fieldLabel}>

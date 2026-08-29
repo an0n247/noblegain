@@ -15,7 +15,7 @@ export function DomainStatusCard() {
     setStatus("loading");
     setProgress(20);
     try {
-      const res = await fetch("/api/public/dns-check?domain=noblegain.qd.je");
+      const res = await fetch("/api/public/dns-check?domain=noblegain.bytsphere.buzz");
       const data = await res.json();
 
       setProgress(100);
@@ -71,7 +71,7 @@ export function DomainStatusCard() {
           </Badge>
         </div>
         <CardDescription className="text-[10px] font-medium italic">
-          Target: noblegain.qd.je
+          Target: noblegain.bytsphere.buzz
         </CardDescription>
       </CardHeader>
 
@@ -118,7 +118,7 @@ export function DomainStatusCard() {
             asChild
           >
             <a
-              href="https://whatsmydns.net/#CNAME/noblegain.qd.je"
+              href="https://whatsmydns.net/#CNAME/noblegain.bytsphere.buzz"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -17,15 +17,39 @@ import { createContext, useContext } from "react";
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
 
+export function resolveThemePreference(
+  storageKey: string,
+  defaultTheme: Theme,
+  storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">,
+): Theme {
+  const browserStorage = storage ?? (typeof window !== "undefined" ? window.localStorage : undefined);
+
+  if (!browserStorage) {
+    return defaultTheme;
+  }
+
+  const legacyKey = "earn-pal-theme";
+  const legacyValue = browserStorage.getItem(legacyKey) as Theme | null;
+  const currentValue = browserStorage.getItem(storageKey) as Theme | null;
+
+  if (legacyValue && !currentValue) {
+    browserStorage.setItem(storageKey, legacyValue);
+    browserStorage.removeItem(legacyKey);
+    return legacyValue;
+  }
+
+  return (currentValue as Theme | null) || defaultTheme;
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "earn-pal-theme",
+  storageKey = "noble-gain-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+      return resolveThemePreference(storageKey, defaultTheme, window.localStorage);
     }
     return defaultTheme;
   });

@@ -98,7 +98,7 @@ export function ReferralStatsDashboard() {
   const referralLink =
     typeof window !== "undefined"
       ? `${window.location.origin}/auth?ref=${referralCode}&mode=signup`
-      : `https://noblegain.lovable.app/auth?ref=${referralCode}&mode=signup`;
+      : `/auth?ref=${referralCode}&mode=signup`;
 
   const copyLink = () => {
     if (!referralLink) return;
