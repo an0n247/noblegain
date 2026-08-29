@@ -35,6 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getClientIp } from "@/lib/session-tracking.functions";
+import { sendSignupOtp, verifySignupOtp } from "@/lib/signup-otp.functions";
 import { z } from "zod";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getUsernameStatus, normalizeUsername, toUsernameFieldState } from "@/lib/username-validation";
