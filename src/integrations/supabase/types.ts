@@ -917,6 +917,18 @@ export type Database = {
           signups: number
         }[]
       }
+      get_my_referees: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          full_name: string
+          has_phone: boolean
+          has_social: boolean
+          id: string
+          username: string
+        }[]
+      }
       get_repeatable_task_stats: {
         Args: { end_date: string; filter_task_id?: string; start_date: string }
         Returns: {
