@@ -37,7 +37,7 @@ import { toast } from "sonner";
 import { getClientIp } from "@/lib/session-tracking.functions";
 import { z } from "zod";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import { getUsernameStatus, normalizeUsername } from "@/lib/username-validation";
+import { getUsernameStatus, normalizeUsername, toUsernameFieldState } from "@/lib/username-validation";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -172,7 +172,7 @@ function AuthPage() {
     const normalized = normalizeUsername(rawValue);
 
     if (!normalized || normalized.length < 3) {
-      setUsernameStatus(getUsernameStatus(rawValue));
+      setUsernameStatus(toUsernameFieldState(getUsernameStatus(rawValue)));
       return;
     }
 
