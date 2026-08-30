@@ -34,8 +34,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { getClientIp } from "@/lib/session-tracking.functions";
-import { sendSignupOtp, verifySignupOtp } from "@/lib/signup-otp.functions";
+import {
+  registerWithSignupOtp,
+  sendSignupOtp,
+  verifySignupOtp,
+} from "@/lib/signup-otp.functions";
 import { z } from "zod";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getUsernameStatus, normalizeUsername, toUsernameFieldState } from "@/lib/username-validation";
@@ -364,31 +367,16 @@ function AuthPage() {
     setLoading(true);
     setError("");
     try {
-      const signupIp = await getClientIp().then((r) => r.ip).catch(() => null);
-
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      await registerWithSignupOtp({
+        data: {
         email,
         password,
-        options: {
-          data: {
-            username,
-            full_name: fullName,
-            referral_code_used: referralCode || null,
-            fingerprint: (window as any)._ep_fingerprint || null,
-            ip_address: signupIp,
-          },
+          username,
+          fullName,
+          referralCode: referralCode || null,
+          fingerprint: (window as any)._ep_fingerprint || null,
         },
       });
-
-      if (signUpError) throw signUpError;
-
-      // Supabase returns a fake "success" (obfuscated user with no identities)
-      // when the email is already registered — detect and block it.
-      if (signUpData.user && signUpData.user.identities?.length === 0) {
-        throw new Error("An account with this email already exists. Please sign in instead.");
-      }
-
-      await sendSignupOtp({ data: { email } });
 
       setVerificationCode("");
       setShowVerification(true);
