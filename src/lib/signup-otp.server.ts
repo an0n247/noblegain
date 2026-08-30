@@ -5,8 +5,8 @@
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
-/** Sender identity — must be a domain verified in Resend. */
-export const OTP_FROM = "Noble Gain <no-reply@noblegain.bytsphere.buzz>";
+/** Sender identity — must be a domain verified in Resend (bytsphere.buzz is verified). */
+export const OTP_FROM = "Noble Gain <no-reply@bytsphere.buzz>";
 
 export const OTP_TTL_MINUTES = 10;
 export const OTP_MAX_ATTEMPTS = 5;
@@ -84,6 +84,6 @@ export async function sendOtpEmail(to: string, code: string): Promise<void> {
   if (!response.ok) {
     const body = await response.text();
     console.error(`Resend request failed [${response.status}]: ${body}`);
-    throw new Error(`Email delivery failed [${response.status}]: ${body}`);
+    throw new Error("We couldn't send the verification email right now. Please try again in a moment.");
   }
 }
